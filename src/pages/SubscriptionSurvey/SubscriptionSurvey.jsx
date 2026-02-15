@@ -108,7 +108,7 @@ function SubscriptionSurvey() {
       q1: finalAnswers[1] || '',
       q2: finalAnswers[2] || '',
       q3: finalAnswers[3] || '',
-      q4: Array.isArray(finalAnswers[4]) ? finalAnswers[4].join(', ') : finalAnswers[4] || '',
+      q4: Array.isArray(finalAnswers[4]) ? finalAnswers[4].join('\n') : finalAnswers[4] || '',
       q5: finalAnswers[5] || '',
       q6: finalAnswers[6] || '',
     }
