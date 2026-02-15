@@ -9,12 +9,13 @@ gsap.registerPlugin(CustomEase)
 
 CustomEase.create('smooth', '0.22, 1, 0.36, 1')
 CustomEase.create('buttery', '0.16, 1, 0.3, 1')
-CustomEase.create('imageSlide', '0.45, 0, 0.55, 1')
 
 const STAGGER_IN = 0.07
 const STAGGER_OUT = 0.04
 const DURATION_IN = 0.55
 const DURATION_OUT = 0.28
+
+const STATIC_IMAGE = '/images/nps/survey-image.webp'
 
 // Parse ?nps= from URL on load
 function getNpsFromUrl() {
@@ -71,9 +72,6 @@ function NpsSurvey() {
 
   const formAreaRef = useRef(null)
   const submitWrapRef = useRef(null)
-  const imagePanelRef = useRef(null)
-  const currentImageRef = useRef(null)
-  const nextImageRef = useRef(null)
   const thankYouRef = useRef(null)
   const surveyContainerRef = useRef(null)
   const autoAdvanceTimer = useRef(null)
@@ -106,16 +104,6 @@ function NpsSurvey() {
 
   // Show button only on text/slider slides (scale auto-advances)
   const showButton = current?.type === 'text' || current?.type === 'slider'
-
-  // Preload all images
-  useEffect(() => {
-    questions.forEach((q) => {
-      if (q.image) {
-        const img = new Image()
-        img.src = q.image
-      }
-    })
-  }, [])
 
   // ─── Staggered entrance animation ───
   useLayoutEffect(() => {
@@ -207,7 +195,7 @@ function NpsSurvey() {
     })
   }, [isAnimating])
 
-  // ─── Staggered exit + image slide ───
+  // ─── Staggered exit (no image slide) ───
   const transitionToStep = useCallback((nextStep) => {
     if (isAnimating) return
     setIsAnimating(true)
@@ -249,52 +237,7 @@ function NpsSurvey() {
       }, i * STAGGER_OUT)
     })
 
-    // Slide images
-    if (
-      currentImageRef.current &&
-      nextImageRef.current &&
-      imagePanelRef.current &&
-      nextQuestion?.image
-    ) {
-      const currentQ = freshVisible[currentStep] || current
-      const imageChanging = currentQ?.image !== nextQuestion.image
-
-      if (imageChanging) {
-        const panelHeight = imagePanelRef.current.offsetHeight
-
-        nextImageRef.current.src = nextQuestion.image
-        gsap.set(nextImageRef.current, { y: panelHeight, opacity: 1, force3D: true })
-        gsap.set(currentImageRef.current, { force3D: true })
-
-        tl.to(currentImageRef.current, {
-          y: -panelHeight,
-          duration: 0.7,
-          ease: 'imageSlide',
-          force3D: true,
-        }, 0)
-
-        tl.to(nextImageRef.current, {
-          y: 0,
-          duration: 0.7,
-          ease: 'imageSlide',
-          force3D: true,
-        }, 0)
-      }
-    }
-
   }, [isAnimating, transitionToThankYou, currentStep, current])
-
-  // Reset images after step change
-  useEffect(() => {
-    if (showThankYou || !current || current.type === 'thankyou') return
-    if (currentImageRef.current) {
-      currentImageRef.current.src = current.image
-      gsap.set(currentImageRef.current, { y: 0, opacity: 1 })
-    }
-    if (nextImageRef.current) {
-      gsap.set(nextImageRef.current, { y: 0, opacity: 0 })
-    }
-  }, [currentStep, showThankYou])
 
   // Scale select — store value and auto advance
   const handleScaleSelect = useCallback((value) => {
@@ -381,9 +324,8 @@ function NpsSurvey() {
   return (
     <div className="nps-survey">
       <div className="survey-container" ref={surveyContainerRef}>
-        <div className="survey-image-panel" ref={imagePanelRef}>
-          <img ref={currentImageRef} src={displayQ.image} alt="" className="survey-image" />
-          <img ref={nextImageRef} src="" alt="" className="survey-image" style={{ opacity: 0 }} />
+        <div className="survey-image-panel">
+          <img src={STATIC_IMAGE} alt="" className="survey-image" />
         </div>
 
         <div className="survey-form-panel">

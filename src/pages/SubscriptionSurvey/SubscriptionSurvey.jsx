@@ -9,12 +9,13 @@ gsap.registerPlugin(CustomEase)
 
 CustomEase.create('smooth', '0.22, 1, 0.36, 1')
 CustomEase.create('buttery', '0.16, 1, 0.3, 1')
-CustomEase.create('imageSlide', '0.45, 0, 0.55, 1')
 
 const STAGGER_IN = 0.07
 const STAGGER_OUT = 0.04
 const DURATION_IN = 0.55
 const DURATION_OUT = 0.28
+
+const STATIC_IMAGE = '/images/subscription/survey-image.webp'
 
 // ⚠️ Replace this URL with your new Google Apps Script deployment URL
 const SHEET_URL = 'https://script.google.com/macros/s/AKfycbz_CuV6vl6FB5rERb_Mk45kzvicZM0PDz_KC0VObt_x54Gy9BF4WkLCrwO1ZvGyb5KM3w/exec'
@@ -89,9 +90,6 @@ function SubscriptionSurvey() {
 
   const formAreaRef = useRef(null)
   const submitWrapRef = useRef(null)
-  const imagePanelRef = useRef(null)
-  const currentImageRef = useRef(null)
-  const nextImageRef = useRef(null)
   const thankYouRef = useRef(null)
   const surveyContainerRef = useRef(null)
   const autoAdvanceTimer = useRef(null)
@@ -166,15 +164,8 @@ function SubscriptionSurvey() {
     return ((currentStep + 1) / totalQuestions) * 100
   })()
 
-  // Preload all images on mount + clean URL params + initial sheet submission
+  // Clean URL params + initial sheet submission on mount
   useEffect(() => {
-    questions.forEach((q) => {
-      const img = new Image()
-      img.src = q.image
-    })
-    const thankImg = new Image()
-    thankImg.src = THANK_YOU.image
-
     // Submit immediately on load if we have an email (captures partial from email link)
     if (emailPrefill?.email) {
       submitToSheet(emailPrefill.answers)
@@ -273,7 +264,7 @@ function SubscriptionSurvey() {
     return () => tl.kill()
   }, [showThankYou])
 
-  // ─── Staggered exit + image slide ───
+  // ─── Staggered exit (no image slide) ───
   const transitionToStep = useCallback((nextStep) => {
     if (isAnimating) return
     setIsAnimating(true)
@@ -282,8 +273,6 @@ function SubscriptionSurvey() {
     const items = getAnimItems(formAreaRef.current)
     const btn = submitWrapRef.current
     const allEls = btn ? [...items, btn] : items
-
-    const nextQuestion = questions[nextStep]
 
     const tl = gsap.timeline({
       onComplete: () => {
@@ -304,55 +293,11 @@ function SubscriptionSurvey() {
       }, i * STAGGER_OUT)
     })
 
-    // Slide images
-    if (
-      currentImageRef.current &&
-      nextImageRef.current &&
-      imagePanelRef.current &&
-      nextQuestion?.image
-    ) {
-      const currentQ = questions[currentStep]
-      const imageChanging = currentQ?.image !== nextQuestion.image
-
-      if (imageChanging) {
-        const panelHeight = imagePanelRef.current.offsetHeight
-
-        nextImageRef.current.src = nextQuestion.image
-        gsap.set(nextImageRef.current, { y: panelHeight, opacity: 1, force3D: true })
-        gsap.set(currentImageRef.current, { force3D: true })
-
-        tl.to(currentImageRef.current, {
-          y: -panelHeight,
-          duration: 0.7,
-          ease: 'imageSlide',
-          force3D: true,
-        }, 0)
-
-        tl.to(nextImageRef.current, {
-          y: 0,
-          duration: 0.7,
-          ease: 'imageSlide',
-          force3D: true,
-        }, 0)
-      }
-    }
   }, [isAnimating, currentStep])
 
   // Keep refs in sync
   transitionToStepRef.current = transitionToStep
   transitionToThankYouRef.current = transitionToThankYou
-
-  // Reset images after step change
-  useEffect(() => {
-    if (showThankYou) return
-    if (currentImageRef.current) {
-      currentImageRef.current.src = questions[currentStep].image
-      gsap.set(currentImageRef.current, { y: 0, opacity: 1 })
-    }
-    if (nextImageRef.current) {
-      gsap.set(nextImageRef.current, { y: 0, opacity: 0 })
-    }
-  }, [currentStep, showThankYou])
 
   // Single select — store value and auto-advance
   const handleSingleSelect = useCallback((option) => {
@@ -490,10 +435,9 @@ function SubscriptionSurvey() {
   return (
     <div className="sub-survey">
       <div className="survey-container" ref={surveyContainerRef}>
-        {/* LEFT - Image */}
-        <div className="survey-image-panel" ref={imagePanelRef}>
-          <img ref={currentImageRef} src={current.image} alt="" className="survey-image" />
-          <img ref={nextImageRef} src="" alt="" className="survey-image" style={{ opacity: 0 }} />
+        {/* LEFT - Static Image */}
+        <div className="survey-image-panel">
+          <img src={STATIC_IMAGE} alt="" className="survey-image" />
         </div>
 
         {/* RIGHT - Form */}
