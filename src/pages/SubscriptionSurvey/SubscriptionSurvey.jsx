@@ -99,20 +99,22 @@ function SubscriptionSurvey() {
   }, [answers])
 
   // ─── Update URL params to reflect current answers ───
-  const updateUrlParams = useCallback((updatedAnswers) => {
-    const params = new URLSearchParams()
-    if (emailPrefill?.email) params.set('email', emailPrefill.email)
+const updateUrlParams = useCallback((updatedAnswers) => {
+  if (!emailPrefill?.email) return
 
-    Object.entries(updatedAnswers).forEach(([qId, value]) => {
-      if (Array.isArray(value)) {
-        params.set(`q${qId}`, value.join(','))
-      } else if (value !== undefined && value !== '') {
-        params.set(`q${qId}`, value)
-      }
-    })
+  const params = new URLSearchParams()
+  params.set('email', emailPrefill.email)
 
-    window.history.replaceState({}, '', `${window.location.pathname}?${params.toString()}`)
-  }, [])
+  Object.entries(updatedAnswers).forEach(([qId, value]) => {
+    if (Array.isArray(value)) {
+      params.set(`q${qId}`, value.join(','))
+    } else if (value !== undefined && value !== '') {
+      params.set(`q${qId}`, value)
+    }
+  })
+
+  window.history.replaceState({}, '', `${window.location.pathname}?${params.toString()}`)
+}, [])
 
   // ─── Submit to Google Sheet ───
   const submitToSheet = useCallback((finalAnswers) => {
