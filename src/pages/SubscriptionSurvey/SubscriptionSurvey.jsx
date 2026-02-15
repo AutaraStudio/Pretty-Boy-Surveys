@@ -21,7 +21,7 @@ const STATIC_IMAGE = '/images/subscription/survey-image.webp'
 const SHEET_URL = 'https://script.google.com/macros/s/AKfycbz_CuV6vl6FB5rERb_Mk45kzvicZM0PDz_KC0VObt_x54Gy9BF4WkLCrwO1ZvGyb5KM3w/exec'
 
 const THANK_YOU = {
-  image: '/images/subscription/slide-6.webp',
+  image: '/images/subscription/thank-you-page.webp',
   heading: 'Thank you for<br>your feedback!',
   body: 'Your responses help us make Laundry Sauce even better.',
   linkText: 'Scent Quiz',

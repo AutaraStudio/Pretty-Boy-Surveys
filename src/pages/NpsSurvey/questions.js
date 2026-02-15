@@ -36,7 +36,7 @@ export const questions = [
   },
   {
     id: 5,
-    image: '/images/nps/slide-3.webp',
+    image: '/images/nps/thank-you-page.webp',
     type: 'thankyou',
     heading: 'Thank you for<br>your feedback!',
     body: 'Want to discover your new favorite scent?',
