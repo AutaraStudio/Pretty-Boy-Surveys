@@ -18,7 +18,7 @@ const DURATION_OUT = 0.28
 const STATIC_IMAGE = '/images/subscription/survey-image.webp'
 
 // ⚠️ Replace this URL with your new Google Apps Script deployment URL
-const SHEET_URL = 'https://script.google.com/macros/s/AKfycbz_CuV6vl6FB5rERb_Mk45kzvicZM0PDz_KC0VObt_x54Gy9BF4WkLCrwO1ZvGyb5KM3w/exec'
+const SHEET_URL = 'https://script.google.com/macros/s/AKfycbyhliXUiqU8dGP21BpcTWKBwfMvzFYZqWCcdmWYWTGlJu9fQ5VF6zEliEiDqp21Xieg/exec'
 
 const THANK_YOU = {
   image: '/images/subscription/thank-you-page.webp',
