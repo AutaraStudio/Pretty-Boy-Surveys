@@ -17,26 +17,29 @@ const DURATION_OUT = 0.28
 
 const STATIC_IMAGE = '/images/nps/survey-image.webp'
 
-// Parse ?nps= from URL on load
+const SHEET_URL = 'https://script.google.com/macros/s/AKfycbyhliXUiqU8dGP21BpcTWKBwfMvzFYZqWCcdmWYWTGlJu9fQ5VF6zEliEiDqp21Xieg/exec'
+
+// Parse ?email= and ?nps= from URL on load
 function getNpsFromUrl() {
   const params = new URLSearchParams(window.location.search)
+  const email = (params.get('email') || '').trim()
   const raw = params.get('nps')
-  if (raw === null) return null
+  if (raw === null) return { email, nps: null }
   const num = parseInt(raw, 10)
-  if (isNaN(num) || num < 0 || num > 10) return null
-  return num
+  if (isNaN(num) || num < 0 || num > 10) return { email, nps: null }
+  return { email, nps: num }
 }
 
 // Compute initial state from URL param
 function getInitialState() {
-  const urlNps = getNpsFromUrl()
+  const { email, nps: urlNps } = getNpsFromUrl()
   if (urlNps !== null) {
     const initialAnswers = { 1: urlNps }
     const visible = getVisibleQuestions(initialAnswers, urlNps)
     const startStep = Math.min(1, visible.length - 1)
-    return { answers: initialAnswers, step: startStep, fromUrl: true }
+    return { answers: initialAnswers, step: startStep, fromUrl: true, email }
   }
-  return { answers: {}, step: 0, fromUrl: false }
+  return { answers: {}, step: 0, fromUrl: false, email }
 }
 
 // Helper to evaluate showIf conditions
@@ -81,10 +84,56 @@ function NpsSurvey() {
     answersRef.current = answers
   }, [answers])
 
+  // ─── Update URL params to reflect current answers ───
+  const updateUrlParams = useCallback((updatedAnswers) => {
+    if (!initial.email) return
+
+    const params = new URLSearchParams()
+    params.set('email', initial.email)
+
+    Object.entries(updatedAnswers).forEach(([qId, value]) => {
+      if (value !== undefined && value !== '') {
+        params.set(`q${qId}`, value)
+      }
+    })
+
+    window.history.replaceState({}, '', `${window.location.pathname}?${params.toString()}`)
+  }, [])
+
+  // ─── Submit to Google Sheet ───
+  const submitToSheet = useCallback((finalAnswers) => {
+    if (!initial.email) return
+
+    const npsVal = finalAnswers[1]
+    const visibleQs = getVisibleQuestions(finalAnswers, npsVal)
+    const textQ = visibleQs.find(q => q.type === 'text')
+    const response = textQ ? (finalAnswers[textQ.id] || '') : ''
+
+    const payload = {
+      type: 'nps',
+      email: initial.email,
+      nps: npsVal !== undefined && npsVal !== null ? String(npsVal) : '',
+      response: response,
+    }
+
+    fetch(SHEET_URL, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }).catch((err) => console.error('Sheet submit error:', err))
+  }, [])
+
+  // Initial sheet submission on mount
+  useEffect(() => {
+    if (initial.email) {
+      submitToSheet(initial.answers)
+      updateUrlParams(initial.answers)
+    }
+  }, [])
+
   const npsScore = answers[1]
-  const visibleQuestions = getVisibleQuestions(answers, npsScore)
-  const current = visibleQuestions[currentStep]
-  const thankyouIndex = visibleQuestions.findIndex(q => q.type === 'thankyou')
+  const visibleQuestions_ = getVisibleQuestions(answers, npsScore)
+  const current = visibleQuestions_[currentStep]
+  const thankyouIndex = visibleQuestions_.findIndex(q => q.type === 'thankyou')
 
   // Track last survey question so form stays rendered during thank you crossfade
   const lastSurveyQ = useRef(null)
@@ -93,7 +142,7 @@ function NpsSurvey() {
   }
   const displayQ = showThankYou ? lastSurveyQ.current : current
 
-  const isLastSurveyStep = currentStep === thankyouIndex - 1 || currentStep === visibleQuestions.length - 1
+  const isLastSurveyStep = currentStep === thankyouIndex - 1 || currentStep === visibleQuestions_.length - 1
 
   const currentAnswer = answers[current?.id]
   const hasAnswer = (() => {
@@ -253,6 +302,10 @@ function NpsSurvey() {
     const updated = { ...answersRef.current, [current.id]: value }
     answersRef.current = updated
     setAnswers(updated)
+    updateUrlParams(updated)
+
+    // Submit progress to sheet on every answer
+    submitToSheet(updated)
 
     // Auto-advance after a beat so user sees their selection
     autoAdvanceTimer.current = setTimeout(() => {
@@ -263,7 +316,7 @@ function NpsSurvey() {
         transitionToStep(nextStep)
       }
     }, 80)
-  }, [current?.id, isAnimating, currentStep, transitionToStep])
+  }, [current?.id, isAnimating, currentStep, transitionToStep, submitToSheet, updateUrlParams])
 
   // Clean up auto-advance timer
   useEffect(() => {
@@ -278,6 +331,7 @@ function NpsSurvey() {
     const updated = { ...answersRef.current, [current.id]: value }
     answersRef.current = updated
     setAnswers(updated)
+    updateUrlParams(updated)
   }
 
   // Submit / next
@@ -296,9 +350,11 @@ function NpsSurvey() {
     }
     setError('')
 
-    console.log('Survey answers so far:', answersRef.current)
+    // Submit progress to sheet on every step
+    submitToSheet(answersRef.current)
+
     transitionToStep(currentStep + 1)
-  }, [hasAnswer, isAnimating, currentStep, transitionToStep])
+  }, [hasAnswer, isAnimating, currentStep, transitionToStep, submitToSheet])
 
   // Enter key
   useEffect(() => {
@@ -317,7 +373,7 @@ function NpsSurvey() {
   }, [currentStep])
 
   // ─── Thank you data ───
-  const tyData = visibleQuestions.find(q => q.type === 'thankyou')
+  const tyData = visibleQuestions_.find(q => q.type === 'thankyou')
 
   if (!displayQ) return null
 
