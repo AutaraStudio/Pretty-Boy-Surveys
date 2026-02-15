@@ -17,7 +17,6 @@ const DURATION_OUT = 0.28
 
 const STATIC_IMAGE = '/images/subscription/survey-image.webp'
 
-// ⚠️ Replace this URL with your new Google Apps Script deployment URL
 const SHEET_URL = 'https://script.google.com/macros/s/AKfycbyhliXUiqU8dGP21BpcTWKBwfMvzFYZqWCcdmWYWTGlJu9fQ5VF6zEliEiDqp21Xieg/exec'
 
 const THANK_YOU = {
@@ -99,6 +98,22 @@ function SubscriptionSurvey() {
     answersRef.current = answers
   }, [answers])
 
+  // ─── Update URL params to reflect current answers ───
+  const updateUrlParams = useCallback((updatedAnswers) => {
+    const params = new URLSearchParams()
+    if (emailPrefill?.email) params.set('email', emailPrefill.email)
+
+    Object.entries(updatedAnswers).forEach(([qId, value]) => {
+      if (Array.isArray(value)) {
+        params.set(`q${qId}`, value.join(','))
+      } else if (value !== undefined && value !== '') {
+        params.set(`q${qId}`, value)
+      }
+    })
+
+    window.history.replaceState({}, '', `${window.location.pathname}?${params.toString()}`)
+  }, [])
+
   // ─── Submit to Google Sheet ───
   const submitToSheet = useCallback((finalAnswers) => {
     if (!emailPrefill?.email) return
@@ -164,16 +179,12 @@ function SubscriptionSurvey() {
     return ((currentStep + 1) / totalQuestions) * 100
   })()
 
-  // Clean URL params + initial sheet submission on mount
+  // Initial sheet submission on mount
   useEffect(() => {
     // Submit immediately on load if we have an email (captures partial from email link)
     if (emailPrefill?.email) {
       submitToSheet(emailPrefill.answers)
-    }
-
-    // Clean email prefill params from URL
-    if (emailPrefill) {
-      window.history.replaceState({}, '', window.location.pathname)
+      updateUrlParams(emailPrefill.answers)
     }
   }, [])
 
@@ -313,6 +324,7 @@ function SubscriptionSurvey() {
     const updated = { ...answersRef.current, [current.id]: option }
     answersRef.current = updated
     setAnswers(updated)
+    updateUrlParams(updated)
 
     // Auto-advance after a beat so user sees their selection
     autoAdvanceTimer.current = setTimeout(() => {
@@ -341,7 +353,7 @@ function SubscriptionSurvey() {
 
       transitionToStepRef.current?.(nextStep)
     }, 350)
-  }, [current.id, isAnimating, currentStep, submitToSheet])
+  }, [current.id, isAnimating, currentStep, submitToSheet, updateUrlParams])
 
   // Multi select toggle
   const handleMultiToggle = (option) => {
@@ -354,6 +366,7 @@ function SubscriptionSurvey() {
         : [...existing, option]
       const newAnswers = { ...prev, [current.id]: updated }
       answersRef.current = newAnswers
+      updateUrlParams(newAnswers)
       return newAnswers
     })
   }
@@ -364,6 +377,7 @@ function SubscriptionSurvey() {
     const updated = { ...answersRef.current, [current.id]: value }
     answersRef.current = updated
     setAnswers(updated)
+    updateUrlParams(updated)
   }
 
   // Submit / Next
