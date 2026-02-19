@@ -20,7 +20,6 @@ const STATIC_IMAGE = '/images/nps/survey-image.webp'
 const SHEET_URL = 'https://script.google.com/macros/s/AKfycbyhliXUiqU8dGP21BpcTWKBwfMvzFYZqWCcdmWYWTGlJu9fQ5VF6zEliEiDqp21Xieg/exec'
 
 // ─── Unique session ID generated once per page visit ───
-// A new ID is created every time the page loads, so revisits = new sheet row
 const SESSION_ID = Math.random().toString(36).substring(2) + Date.now().toString(36)
 
 // Parse ?email= and ?nps= from URL on load
@@ -68,6 +67,23 @@ function getAnimItems(container) {
   return Array.from(container.querySelectorAll('.anim-item'))
 }
 
+// Back arrow icon — the provided SVG flipped horizontally
+function BackIcon() {
+  return (
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      style={{ transform: 'scaleX(-1)' }}
+    >
+      <path d="M15 10L20 15L15 20" stroke="currentColor" strokeMiterlimit="10" />
+      <path d="M4 4V12L7 15H20" stroke="currentColor" strokeMiterlimit="10" />
+    </svg>
+  )
+}
+
 function NpsSurvey() {
   const initial = useRef(getInitialState()).current
 
@@ -88,19 +104,16 @@ function NpsSurvey() {
     answersRef.current = answers
   }, [answers])
 
-  // ─── Update URL params to reflect current answers ───
+  // ─── Update URL params ───
   const updateUrlParams = useCallback((updatedAnswers) => {
     if (!initial.email) return
-
     const params = new URLSearchParams()
     params.set('email', initial.email)
-
     Object.entries(updatedAnswers).forEach(([qId, value]) => {
       if (value !== undefined && value !== '') {
         params.set(`q${qId}`, value)
       }
     })
-
     window.history.replaceState({}, '', `${window.location.pathname}?${params.toString()}`)
   }, [])
 
@@ -115,16 +128,14 @@ function NpsSurvey() {
 
     const payload = {
       type: 'nps',
-      sessionId: SESSION_ID,           // ties all steps in this visit to one row
+      sessionId: SESSION_ID,
       email: initial.email,
       nps: npsVal !== undefined && npsVal !== null ? String(npsVal) : '',
       response: response,
     }
 
-    fetch(SHEET_URL, {
-      method: 'POST',
-      body: JSON.stringify(payload),
-    }).catch((err) => console.error('Sheet submit error:', err))
+    fetch(SHEET_URL, { method: 'POST', body: JSON.stringify(payload) })
+      .catch((err) => console.error('Sheet submit error:', err))
   }, [])
 
   // Initial sheet submission on mount
@@ -147,8 +158,6 @@ function NpsSurvey() {
   }
   const displayQ = showThankYou ? lastSurveyQ.current : current
 
-  const isLastSurveyStep = currentStep === thankyouIndex - 1 || currentStep === visibleQuestions_.length - 1
-
   const currentAnswer = answers[current?.id]
   const hasAnswer = (() => {
     if (!current) return false
@@ -158,6 +167,7 @@ function NpsSurvey() {
 
   // Show button only on text/slider slides (scale auto-advances)
   const showButton = current?.type === 'text' || current?.type === 'slider'
+  const showBackButton = currentStep > 0 && !showThankYou
 
   // ─── Staggered entrance animation ───
   useLayoutEffect(() => {
@@ -170,25 +180,11 @@ function NpsSurvey() {
     if (btn) gsap.set(btn, { opacity: 0, y: 14, filter: 'blur(6px)' })
 
     const tl = gsap.timeline({ delay: 0.08 })
-
     items.forEach((el, i) => {
-      tl.to(el, {
-        opacity: 1,
-        y: 0,
-        filter: 'blur(0px)',
-        duration: DURATION_IN,
-        ease: 'buttery',
-      }, i * STAGGER_IN)
+      tl.to(el, { opacity: 1, y: 0, filter: 'blur(0px)', duration: DURATION_IN, ease: 'buttery' }, i * STAGGER_IN)
     })
-
     if (btn) {
-      tl.to(btn, {
-        opacity: 1,
-        y: 0,
-        filter: 'blur(0px)',
-        duration: DURATION_IN,
-        ease: 'buttery',
-      }, items.length * STAGGER_IN + 0.02)
+      tl.to(btn, { opacity: 1, y: 0, filter: 'blur(0px)', duration: DURATION_IN, ease: 'buttery' }, items.length * STAGGER_IN + 0.02)
     }
 
     return () => tl.kill()
@@ -199,8 +195,6 @@ function NpsSurvey() {
     if (isAnimating) return
     setIsAnimating(true)
     setError('')
-
-    // Immediately render the thank you screen (hidden)
     setShowThankYou(true)
     setCurrentStep(nextStep)
 
@@ -214,42 +208,19 @@ function NpsSurvey() {
       gsap.set(thankYouRef.current, { opacity: 0 })
       gsap.set(tyItems, { opacity: 0, y: 24, filter: 'blur(10px)' })
 
-      const tl = gsap.timeline({
-        onComplete: () => setIsAnimating(false)
-      })
+      const tl = gsap.timeline({ onComplete: () => setIsAnimating(false) })
 
-      // Fade out the entire survey (form + image panel together)
       if (surveyContainerRef.current) {
-        tl.to(surveyContainerRef.current, {
-          opacity: 0,
-          scale: 0.97,
-          filter: 'blur(6px)',
-          duration: 0.7,
-          ease: 'power2.inOut',
-        }, 0)
+        tl.to(surveyContainerRef.current, { opacity: 0, scale: 0.97, filter: 'blur(6px)', duration: 0.7, ease: 'power2.inOut' }, 0)
       }
-
-      // Crossfade in the thank you backdrop, overlapping
-      tl.to(thankYouRef.current, {
-        opacity: 1,
-        duration: 0.8,
-        ease: 'power2.inOut',
-      }, 0.15)
-
-      // Stagger in thank you content elements
+      tl.to(thankYouRef.current, { opacity: 1, duration: 0.8, ease: 'power2.inOut' }, 0.15)
       tyItems.forEach((el, i) => {
-        tl.to(el, {
-          opacity: 1,
-          y: 0,
-          filter: 'blur(0px)',
-          duration: 0.7,
-          ease: 'buttery',
-        }, 0.4 + i * 0.12)
+        tl.to(el, { opacity: 1, y: 0, filter: 'blur(0px)', duration: 0.7, ease: 'buttery' }, 0.4 + i * 0.12)
       })
     })
   }, [isAnimating])
 
-  // ─── Staggered exit (no image slide) ───
+  // ─── Transition forward ───
   const transitionToStep = useCallback((nextStep) => {
     if (isAnimating) return
     setIsAnimating(true)
@@ -262,7 +233,7 @@ function NpsSurvey() {
 
     // Thank you → use dedicated crossfade
     if (nextQuestion?.type === 'thankyou') {
-      setIsAnimating(false) // transitionToThankYou will re-set this
+      setIsAnimating(false)
       transitionToThankYou(nextStep)
       return
     }
@@ -271,34 +242,46 @@ function NpsSurvey() {
     const btn = submitWrapRef.current
     const allEls = btn ? [...items, btn] : items
 
-    // Build exit timeline
     const tl = gsap.timeline({
-      onComplete: () => {
-        setCurrentStep(nextStep)
-        setIsAnimating(false)
-      }
+      onComplete: () => { setCurrentStep(nextStep); setIsAnimating(false) }
     })
-
-    // Stagger out — reverse order for a nice cascading feel
     const reversed = [...allEls].reverse()
     reversed.forEach((el, i) => {
-      tl.to(el, {
-        opacity: 0,
-        y: -10,
-        filter: 'blur(6px)',
-        duration: DURATION_OUT,
-        ease: 'smooth',
-      }, i * STAGGER_OUT)
+      tl.to(el, { opacity: 0, y: -10, filter: 'blur(6px)', duration: DURATION_OUT, ease: 'smooth' }, i * STAGGER_OUT)
     })
-
   }, [isAnimating, transitionToThankYou, currentStep, current])
 
-  // Scale select — store value and auto advance
+  // ─── Transition backward ───
+  const transitionToPrevStep = useCallback(() => {
+    if (isAnimating || currentStep === 0) return
+    setIsAnimating(true)
+    setError('')
+
+    if (autoAdvanceTimer.current) {
+      clearTimeout(autoAdvanceTimer.current)
+      autoAdvanceTimer.current = null
+    }
+
+    const items = getAnimItems(formAreaRef.current)
+    const btn = submitWrapRef.current
+    const allEls = btn ? [...items, btn] : items
+    const prevStep = currentStep - 1
+
+    const tl = gsap.timeline({
+      onComplete: () => { setCurrentStep(prevStep); setIsAnimating(false) }
+    })
+    // Animate out downward so it feels like going back
+    const reversed = [...allEls].reverse()
+    reversed.forEach((el, i) => {
+      tl.to(el, { opacity: 0, y: 10, filter: 'blur(6px)', duration: DURATION_OUT, ease: 'smooth' }, i * STAGGER_OUT)
+    })
+  }, [isAnimating, currentStep])
+
+  // ─── Scale select — store value and auto advance ───
   const handleScaleSelect = useCallback((value) => {
     if (isAnimating) return
     setError('')
 
-    // Clear any pending auto-advance
     if (autoAdvanceTimer.current) {
       clearTimeout(autoAdvanceTimer.current)
       autoAdvanceTimer.current = null
@@ -309,10 +292,9 @@ function NpsSurvey() {
     setAnswers(updated)
     updateUrlParams(updated)
 
-    // Submit progress to sheet on every answer
+    // Submit progress on every answer (sheet will update row via session ID)
     submitToSheet(updated)
 
-    // Auto-advance after a beat so user sees their selection
     autoAdvanceTimer.current = setTimeout(() => {
       autoAdvanceTimer.current = null
       const freshVisible = getVisibleQuestions(updated, updated[1])
@@ -325,12 +307,10 @@ function NpsSurvey() {
 
   // Clean up auto-advance timer
   useEffect(() => {
-    return () => {
-      if (autoAdvanceTimer.current) clearTimeout(autoAdvanceTimer.current)
-    }
+    return () => { if (autoAdvanceTimer.current) clearTimeout(autoAdvanceTimer.current) }
   }, [])
 
-  // Text input
+  // ─── Text input ───
   const handleTextChange = (value) => {
     setError('')
     const updated = { ...answersRef.current, [current.id]: value }
@@ -339,11 +319,10 @@ function NpsSurvey() {
     updateUrlParams(updated)
   }
 
-  // Submit / next
+  // ─── Submit / next ───
   const handleSubmit = useCallback(() => {
     if (isAnimating) return
 
-    // If scale auto-advance is pending, cancel it — the user clicked manually
     if (autoAdvanceTimer.current) {
       clearTimeout(autoAdvanceTimer.current)
       autoAdvanceTimer.current = null
@@ -355,9 +334,7 @@ function NpsSurvey() {
     }
     setError('')
 
-    // Submit progress to sheet on every step
     submitToSheet(answersRef.current)
-
     transitionToStep(currentStep + 1)
   }, [hasAnswer, isAnimating, currentStep, transitionToStep, submitToSheet])
 
@@ -373,9 +350,7 @@ function NpsSurvey() {
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [handleSubmit, showButton])
 
-  useEffect(() => {
-    setError('')
-  }, [currentStep])
+  useEffect(() => { setError('') }, [currentStep])
 
   // ─── Thank you data ───
   const tyData = visibleQuestions_.find(q => q.type === 'thankyou')
@@ -444,13 +419,25 @@ function NpsSurvey() {
               </div>
             </div>
 
-            {showButton && !showThankYou && (
-              <div ref={submitWrapRef} className="survey-submit">
-                <button className="submit-btn" onClick={handleSubmit}>
-                  {displayQ.type === 'scale' ? 'Next' : 'Submit'}
-                </button>
-              </div>
-            )}
+            {/* Bottom row: back button left, next/submit right */}
+            <div className="survey-bottom-row">
+              <button
+                className={`back-btn ${showBackButton ? 'visible' : ''}`}
+                onClick={transitionToPrevStep}
+                aria-label="Go back"
+                tabIndex={showBackButton ? 0 : -1}
+              >
+                <BackIcon />
+              </button>
+
+              {showButton && !showThankYou && (
+                <div ref={submitWrapRef} className="survey-submit">
+                  <button className="submit-btn" onClick={handleSubmit}>
+                    {displayQ.type === 'scale' ? 'Next' : 'Submit'}
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
