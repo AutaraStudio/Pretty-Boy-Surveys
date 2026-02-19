@@ -486,3 +486,54 @@
     font-size: clamp(13px, 3.5vw, 15px);
   }
 }
+
+/* ─── Back Button + Bottom Row ─── */
+/* Add this block to the bottom of both SubscriptionSurvey.css and NpsSurvey.css */
+
+.survey-bottom-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: clamp(28px, 3vw, 44px);
+  flex-shrink: 0;
+  min-height: 60px;
+}
+
+.back-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: 1.5px solid var(--color-border);
+  border-radius: 0px;
+  background: transparent;
+  color: var(--color-text);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  flex-shrink: 0;
+  /* Hidden by default — shown only when .visible is applied */
+  opacity: 0;
+  pointer-events: none;
+}
+
+.back-btn.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.back-btn:hover {
+  background: var(--color-surface);
+  border-color: var(--color-border-hover);
+  transform: translateY(-1px);
+}
+
+.back-btn:active {
+  transform: translateY(0);
+}
+
+/* Move existing survey-submit padding into the bottom row context */
+/* Remove the standalone padding-top from .survey-submit if it conflicts */
+.survey-bottom-row .survey-submit {
+  padding-top: 0;
+}
