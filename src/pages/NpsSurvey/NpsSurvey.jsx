@@ -19,6 +19,10 @@ const STATIC_IMAGE = '/images/nps/survey-image.webp'
 
 const SHEET_URL = 'https://script.google.com/macros/s/AKfycbyhliXUiqU8dGP21BpcTWKBwfMvzFYZqWCcdmWYWTGlJu9fQ5VF6zEliEiDqp21Xieg/exec'
 
+// ─── Unique session ID generated once per page visit ───
+// A new ID is created every time the page loads, so revisits = new sheet row
+const SESSION_ID = Math.random().toString(36).substring(2) + Date.now().toString(36)
+
 // Parse ?email= and ?nps= from URL on load
 function getNpsFromUrl() {
   const params = new URLSearchParams(window.location.search)
@@ -111,6 +115,7 @@ function NpsSurvey() {
 
     const payload = {
       type: 'nps',
+      sessionId: SESSION_ID,           // ties all steps in this visit to one row
       email: initial.email,
       nps: npsVal !== undefined && npsVal !== null ? String(npsVal) : '',
       response: response,
