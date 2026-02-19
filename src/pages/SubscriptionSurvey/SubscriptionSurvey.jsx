@@ -28,7 +28,6 @@ const THANK_YOU = {
 }
 
 // ─── Unique session ID generated once per page visit ───
-// A new ID is created every time the page loads, so revisits = new sheet row
 const SESSION_ID = Math.random().toString(36).substring(2) + Date.now().toString(36)
 
 // Collect all .anim-item elements inside a container
@@ -38,14 +37,10 @@ function getAnimItems(container) {
 }
 
 // Parse URL params to pre-fill answers from email links
-// URL format: ?email=user@example.com&question=1&answer=2
 function getEmailPrefill() {
   try {
     const params = new URLSearchParams(window.location.search)
-
-    // Capture email
     const email = params.get('email') || ''
-
     const qParam = params.get('question') || params.get('q')
     const aParam = params.get('answer') ?? params.get('a')
 
@@ -72,17 +67,30 @@ function getEmailPrefill() {
     let startStep = qIndex + 1
     if (startStep >= questions.length) startStep = questions.length - 1
 
-    return {
-      email,
-      answers: { [question.id]: answerValue },
-      startStep,
-    }
+    return { email, answers: { [question.id]: answerValue }, startStep }
   } catch {
     return { email: '', answers: {}, startStep: 0 }
   }
 }
 
 const emailPrefill = getEmailPrefill()
+
+// Back arrow icon — the provided SVG flipped horizontally
+function BackIcon() {
+  return (
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      style={{ transform: 'scaleX(-1)' }}
+    >
+      <path d="M15 10L20 15L15 20" stroke="currentColor" strokeMiterlimit="10" />
+      <path d="M4 4V12L7 15H20" stroke="currentColor" strokeMiterlimit="10" />
+    </svg>
+  )
+}
 
 function SubscriptionSurvey() {
   const [currentStep, setCurrentStep] = useState(emailPrefill?.startStep ?? 0)
@@ -102,13 +110,11 @@ function SubscriptionSurvey() {
     answersRef.current = answers
   }, [answers])
 
-  // ─── Update URL params to reflect current answers ───
+  // ─── Update URL params ───
   const updateUrlParams = useCallback((updatedAnswers) => {
     if (!emailPrefill?.email) return
-
     const params = new URLSearchParams()
     params.set('email', emailPrefill.email)
-
     Object.entries(updatedAnswers).forEach(([qId, value]) => {
       if (Array.isArray(value)) {
         params.set(`q${qId}`, value.join(','))
@@ -116,16 +122,14 @@ function SubscriptionSurvey() {
         params.set(`q${qId}`, value)
       }
     })
-
     window.history.replaceState({}, '', `${window.location.pathname}?${params.toString()}`)
   }, [])
 
   // ─── Submit to Google Sheet ───
   const submitToSheet = useCallback((finalAnswers) => {
     if (!emailPrefill?.email) return
-
     const payload = {
-      sessionId: SESSION_ID,           // ties all steps in this visit to one row
+      sessionId: SESSION_ID,
       email: emailPrefill?.email || '',
       q1: finalAnswers[1] || '',
       q2: finalAnswers[2] || '',
@@ -134,46 +138,34 @@ function SubscriptionSurvey() {
       q5: finalAnswers[5] || '',
       q6: finalAnswers[6] || '',
     }
-
-    fetch(SHEET_URL, {
-      method: 'POST',
-      body: JSON.stringify(payload),
-    }).catch((err) => console.error('Sheet submit error:', err))
+    fetch(SHEET_URL, { method: 'POST', body: JSON.stringify(payload) })
+      .catch((err) => console.error('Sheet submit error:', err))
   }, [])
 
-  // Refs to always get latest transition functions (avoids stale closures in setTimeout)
   const transitionToStepRef = useRef(null)
   const transitionToThankYouRef = useRef(null)
 
   const current = questions[currentStep]
   const totalQuestions = questions.length
-
   const currentAnswer = answers[current.id]
+
   const hasAnswer = (() => {
     if (current.type === 'multi') return currentAnswer && currentAnswer.length > 0
     return currentAnswer !== undefined && currentAnswer !== ''
   })()
 
-  // Check if Q6 should be shown based on Q5 answer
-  const shouldShowQ6 = (answer) => {
-    return ['Unsure', 'Unlikely', 'Very unlikely'].includes(answer)
-  }
+  const shouldShowQ6 = (answer) => ['Unsure', 'Unlikely', 'Very unlikely'].includes(answer)
 
-  // Only show button on multi-select and text slides (single-select auto-advances)
   const showButton = current.type === 'multi' || current.type === 'text'
   const isFinalStep = currentStep === questions.length - 1
+  const showBackButton = currentStep > 0 && !showThankYou
 
-  // Button text logic
   const buttonText = (() => {
     if (isFinalStep) return 'Submit'
-    // Q5 (index 4): show Submit if positive (goes straight to thank you)
-    if (currentStep === 4) {
-      if (currentAnswer && !shouldShowQ6(currentAnswer)) return 'Submit'
-    }
+    if (currentStep === 4 && currentAnswer && !shouldShowQ6(currentAnswer)) return 'Submit'
     return 'Next'
   })()
 
-  // Progress display
   const progressLabel = (() => {
     if (showThankYou) return 'Complete!'
     if (current.conditional && currentStep === questions.length - 1) return 'Complete!'
@@ -188,7 +180,6 @@ function SubscriptionSurvey() {
 
   // Initial sheet submission on mount
   useEffect(() => {
-    // Submit immediately on load if we have an email (captures partial from email link)
     if (emailPrefill?.email) {
       submitToSheet(emailPrefill.answers)
       updateUrlParams(emailPrefill.answers)
@@ -206,31 +197,17 @@ function SubscriptionSurvey() {
     if (btn) gsap.set(btn, { opacity: 0, y: 14, filter: 'blur(6px)' })
 
     const tl = gsap.timeline({ delay: 0.08 })
-
     items.forEach((el, i) => {
-      tl.to(el, {
-        opacity: 1,
-        y: 0,
-        filter: 'blur(0px)',
-        duration: DURATION_IN,
-        ease: 'buttery',
-      }, i * STAGGER_IN)
+      tl.to(el, { opacity: 1, y: 0, filter: 'blur(0px)', duration: DURATION_IN, ease: 'buttery' }, i * STAGGER_IN)
     })
-
     if (btn) {
-      tl.to(btn, {
-        opacity: 1,
-        y: 0,
-        filter: 'blur(0px)',
-        duration: DURATION_IN,
-        ease: 'buttery',
-      }, items.length * STAGGER_IN + 0.02)
+      tl.to(btn, { opacity: 1, y: 0, filter: 'blur(0px)', duration: DURATION_IN, ease: 'buttery' }, items.length * STAGGER_IN + 0.02)
     }
 
     return () => tl.kill()
   }, [currentStep, showThankYou])
 
-  // ─── Transition to thank you: just flip the flag ───
+  // ─── Transition to thank you ───
   const transitionToThankYou = useCallback(() => {
     if (isAnimating || showThankYou) return
     setIsAnimating(true)
@@ -246,43 +223,20 @@ function SubscriptionSurvey() {
     gsap.set(thankYouRef.current, { opacity: 0 })
     gsap.set(tyItems, { opacity: 0, y: 24, filter: 'blur(10px)' })
 
-    const tl = gsap.timeline({
-      onComplete: () => setIsAnimating(false)
-    })
+    const tl = gsap.timeline({ onComplete: () => setIsAnimating(false) })
 
-    // Fade out the entire survey
     if (surveyContainerRef.current) {
-      tl.to(surveyContainerRef.current, {
-        opacity: 0,
-        scale: 0.97,
-        filter: 'blur(6px)',
-        duration: 0.7,
-        ease: 'power2.inOut',
-      }, 0)
+      tl.to(surveyContainerRef.current, { opacity: 0, scale: 0.97, filter: 'blur(6px)', duration: 0.7, ease: 'power2.inOut' }, 0)
     }
-
-    // Crossfade in the thank you backdrop
-    tl.to(thankYouRef.current, {
-      opacity: 1,
-      duration: 0.8,
-      ease: 'power2.inOut',
-    }, 0.15)
-
-    // Stagger in thank you content elements
+    tl.to(thankYouRef.current, { opacity: 1, duration: 0.8, ease: 'power2.inOut' }, 0.15)
     tyItems.forEach((el, i) => {
-      tl.to(el, {
-        opacity: 1,
-        y: 0,
-        filter: 'blur(0px)',
-        duration: 0.7,
-        ease: 'buttery',
-      }, 0.4 + i * 0.12)
+      tl.to(el, { opacity: 1, y: 0, filter: 'blur(0px)', duration: 0.7, ease: 'buttery' }, 0.4 + i * 0.12)
     })
 
     return () => tl.kill()
   }, [showThankYou])
 
-  // ─── Staggered exit (no image slide) ───
+  // ─── Transition forward ───
   const transitionToStep = useCallback((nextStep) => {
     if (isAnimating) return
     setIsAnimating(true)
@@ -293,36 +247,49 @@ function SubscriptionSurvey() {
     const allEls = btn ? [...items, btn] : items
 
     const tl = gsap.timeline({
-      onComplete: () => {
-        setCurrentStep(nextStep)
-        setIsAnimating(false)
-      }
+      onComplete: () => { setCurrentStep(nextStep); setIsAnimating(false) }
     })
-
-    // Stagger out — reverse order for cascading feel
     const reversed = [...allEls].reverse()
     reversed.forEach((el, i) => {
-      tl.to(el, {
-        opacity: 0,
-        y: -10,
-        filter: 'blur(6px)',
-        duration: DURATION_OUT,
-        ease: 'smooth',
-      }, i * STAGGER_OUT)
+      tl.to(el, { opacity: 0, y: -10, filter: 'blur(6px)', duration: DURATION_OUT, ease: 'smooth' }, i * STAGGER_OUT)
     })
+  }, [isAnimating])
 
+  // ─── Transition backward ───
+  const transitionToPrevStep = useCallback(() => {
+    if (isAnimating || currentStep === 0) return
+    setIsAnimating(true)
+    setError('')
+
+    if (autoAdvanceTimer.current) {
+      clearTimeout(autoAdvanceTimer.current)
+      autoAdvanceTimer.current = null
+    }
+
+    const items = getAnimItems(formAreaRef.current)
+    const btn = submitWrapRef.current
+    const allEls = btn ? [...items, btn] : items
+    const prevStep = currentStep - 1
+
+    const tl = gsap.timeline({
+      onComplete: () => { setCurrentStep(prevStep); setIsAnimating(false) }
+    })
+    // Animate out downward so it feels like going back
+    const reversed = [...allEls].reverse()
+    reversed.forEach((el, i) => {
+      tl.to(el, { opacity: 0, y: 10, filter: 'blur(6px)', duration: DURATION_OUT, ease: 'smooth' }, i * STAGGER_OUT)
+    })
   }, [isAnimating, currentStep])
 
   // Keep refs in sync
   transitionToStepRef.current = transitionToStep
   transitionToThankYouRef.current = transitionToThankYou
 
-  // Single select — store value and auto-advance
+  // ─── Single select — auto-advance ───
   const handleSingleSelect = useCallback((option) => {
     if (isAnimating) return
     setError('')
 
-    // Clear any pending auto-advance
     if (autoAdvanceTimer.current) {
       clearTimeout(autoAdvanceTimer.current)
       autoAdvanceTimer.current = null
@@ -333,26 +300,20 @@ function SubscriptionSurvey() {
     setAnswers(updated)
     updateUrlParams(updated)
 
-    // Auto-advance after a beat so user sees their selection
     autoAdvanceTimer.current = setTimeout(() => {
       autoAdvanceTimer.current = null
-
-      // Submit progress to sheet on every answer
       submitToSheet(updated)
 
       const nextStep = currentStep + 1
       const nextQuestion = questions[nextStep]
 
-      // Check if next question is conditional and should be skipped
       if (nextQuestion && nextQuestion.conditional) {
         if (!shouldShowQ6(option)) {
-          // Skip Q6, go straight to thank you
           transitionToThankYouRef.current?.()
           return
         }
       }
 
-      // If this was the last step, go to thank you
       if (currentStep >= questions.length - 1) {
         transitionToThankYouRef.current?.()
         return
@@ -362,7 +323,7 @@ function SubscriptionSurvey() {
     }, 350)
   }, [current.id, isAnimating, currentStep, submitToSheet, updateUrlParams])
 
-  // Multi select toggle
+  // ─── Multi select toggle ───
   const handleMultiToggle = (option) => {
     if (isAnimating) return
     setError('')
@@ -378,7 +339,7 @@ function SubscriptionSurvey() {
     })
   }
 
-  // Text input
+  // ─── Text input ───
   const handleTextChange = (value) => {
     setError('')
     const updated = { ...answersRef.current, [current.id]: value }
@@ -387,41 +348,33 @@ function SubscriptionSurvey() {
     updateUrlParams(updated)
   }
 
-  // Submit / Next
+  // ─── Submit / Next ───
   const handleSubmit = useCallback(() => {
     if (isAnimating || showThankYou) return
 
-    // Cancel any pending auto-advance
     if (autoAdvanceTimer.current) {
       clearTimeout(autoAdvanceTimer.current)
       autoAdvanceTimer.current = null
     }
 
-    // Only require an answer if the question is NOT conditional (Q6 is optional)
     if (!hasAnswer && !current.conditional) {
       setError('Please complete this question before continuing')
       return
     }
     setError('')
 
-    // Submit progress to sheet on every step
     submitToSheet(answersRef.current)
 
-    // If on final step, submit and go to thank you
     if (isFinalStep) {
       transitionToThankYou()
       return
     }
 
-    // Determine next step
     const nextStep = currentStep + 1
     const nextQuestion = questions[nextStep]
 
-    // If next question is conditional, check if it should show
     if (nextQuestion && nextQuestion.conditional) {
-      const currentVal = currentAnswer
-      if (!shouldShowQ6(currentVal)) {
-        // Skip Q6, go straight to thank you
+      if (!shouldShowQ6(currentAnswer)) {
         transitionToThankYou()
         return
       }
@@ -442,15 +395,10 @@ function SubscriptionSurvey() {
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [handleSubmit, showThankYou, showButton])
 
-  useEffect(() => {
-    setError('')
-  }, [currentStep])
+  useEffect(() => { setError('') }, [currentStep])
 
-  // Clean up auto-advance timer
   useEffect(() => {
-    return () => {
-      if (autoAdvanceTimer.current) clearTimeout(autoAdvanceTimer.current)
-    }
+    return () => { if (autoAdvanceTimer.current) clearTimeout(autoAdvanceTimer.current) }
   }, [])
 
   return (
@@ -528,13 +476,25 @@ function SubscriptionSurvey() {
                 </div>
               </div>
 
-              {showButton && (
-                <div ref={submitWrapRef} className="survey-submit">
-                  <button className="submit-btn" onClick={handleSubmit}>
-                    {buttonText}
-                  </button>
-                </div>
-              )}
+              {/* Bottom row: back button left, next/submit right */}
+              <div className="survey-bottom-row">
+                <button
+                  className={`back-btn ${showBackButton ? 'visible' : ''}`}
+                  onClick={transitionToPrevStep}
+                  aria-label="Go back"
+                  tabIndex={showBackButton ? 0 : -1}
+                >
+                  <BackIcon />
+                </button>
+
+                {showButton && (
+                  <div ref={submitWrapRef} className="survey-submit">
+                    <button className="submit-btn" onClick={handleSubmit}>
+                      {buttonText}
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
