@@ -27,6 +27,10 @@ const THANK_YOU = {
   linkUrl: 'https://laundrysauce.com/pages/quiz#step=1',
 }
 
+// ─── Unique session ID generated once per page visit ───
+// A new ID is created every time the page loads, so revisits = new sheet row
+const SESSION_ID = Math.random().toString(36).substring(2) + Date.now().toString(36)
+
 // Collect all .anim-item elements inside a container
 function getAnimItems(container) {
   if (!container) return []
@@ -99,28 +103,29 @@ function SubscriptionSurvey() {
   }, [answers])
 
   // ─── Update URL params to reflect current answers ───
-const updateUrlParams = useCallback((updatedAnswers) => {
-  if (!emailPrefill?.email) return
+  const updateUrlParams = useCallback((updatedAnswers) => {
+    if (!emailPrefill?.email) return
 
-  const params = new URLSearchParams()
-  params.set('email', emailPrefill.email)
+    const params = new URLSearchParams()
+    params.set('email', emailPrefill.email)
 
-  Object.entries(updatedAnswers).forEach(([qId, value]) => {
-    if (Array.isArray(value)) {
-      params.set(`q${qId}`, value.join(','))
-    } else if (value !== undefined && value !== '') {
-      params.set(`q${qId}`, value)
-    }
-  })
+    Object.entries(updatedAnswers).forEach(([qId, value]) => {
+      if (Array.isArray(value)) {
+        params.set(`q${qId}`, value.join(','))
+      } else if (value !== undefined && value !== '') {
+        params.set(`q${qId}`, value)
+      }
+    })
 
-  window.history.replaceState({}, '', `${window.location.pathname}?${params.toString()}`)
-}, [])
+    window.history.replaceState({}, '', `${window.location.pathname}?${params.toString()}`)
+  }, [])
 
   // ─── Submit to Google Sheet ───
   const submitToSheet = useCallback((finalAnswers) => {
     if (!emailPrefill?.email) return
 
     const payload = {
+      sessionId: SESSION_ID,           // ties all steps in this visit to one row
       email: emailPrefill?.email || '',
       q1: finalAnswers[1] || '',
       q2: finalAnswers[2] || '',
