@@ -30,13 +30,25 @@ const THANK_YOU = {
 // ─── Unique session ID generated once per page visit ───
 const SESSION_ID = Math.random().toString(36).substring(2) + Date.now().toString(36)
 
-// Collect all .anim-item elements inside a container
+// Q4 only shows if Q3 answer indicates dissatisfaction
+const shouldShowQ4 = (answers) =>
+  ["It's okay", 'Not for me', 'Strongly dislike'].includes(answers[3])
+
+// Q6 only shows if Q5 indicates unlikely to continue
+const shouldShowQ6 = (answer) =>
+  ['Unsure', 'Unlikely', 'Very unlikely'].includes(answer)
+
+// Step constants
+const STEP_Q3 = 2
+const STEP_Q4 = 3
+const STEP_Q5 = 4
+const STEP_Q6 = 5
+
 function getAnimItems(container) {
   if (!container) return []
   return Array.from(container.querySelectorAll('.anim-item'))
 }
 
-// Parse URL params to pre-fill answers from email links
 function getEmailPrefill() {
   try {
     const params = new URLSearchParams(window.location.search)
@@ -44,26 +56,20 @@ function getEmailPrefill() {
     const qParam = params.get('question') || params.get('q')
     const aParam = params.get('answer') ?? params.get('a')
 
-    if (!qParam || aParam === null) {
-      return { email, answers: {}, startStep: 0 }
-    }
+    if (!qParam || aParam === null) return { email, answers: {}, startStep: 0 }
 
     const qIndex = parseInt(qParam, 10) - 1
-    if (isNaN(qIndex) || qIndex < 0 || qIndex >= questions.length) {
+    if (isNaN(qIndex) || qIndex < 0 || qIndex >= questions.length)
       return { email, answers: {}, startStep: 0 }
-    }
 
     const question = questions[qIndex]
-    if (!question.options) {
-      return { email, answers: {}, startStep: 0 }
-    }
+    if (!question.options) return { email, answers: {}, startStep: 0 }
 
     const aIndex = parseInt(aParam, 10) - 1
-    if (isNaN(aIndex) || aIndex < 0 || aIndex >= question.options.length) {
+    if (isNaN(aIndex) || aIndex < 0 || aIndex >= question.options.length)
       return { email, answers: {}, startStep: 0 }
-    }
-    const answerValue = question.options[aIndex]
 
+    const answerValue = question.options[aIndex]
     let startStep = qIndex + 1
     if (startStep >= questions.length) startStep = questions.length - 1
 
@@ -75,7 +81,6 @@ function getEmailPrefill() {
 
 const emailPrefill = getEmailPrefill()
 
-// Back arrow icon — the provided SVG flipped horizontally
 function BackIcon() {
   return (
     <svg
@@ -106,9 +111,7 @@ function SubscriptionSurvey() {
   const autoAdvanceTimer = useRef(null)
 
   const answersRef = useRef(emailPrefill?.answers ?? {})
-  useEffect(() => {
-    answersRef.current = answers
-  }, [answers])
+  useEffect(() => { answersRef.current = answers }, [answers])
 
   // ─── Update URL params ───
   const updateUrlParams = useCallback((updatedAnswers) => {
@@ -134,7 +137,7 @@ function SubscriptionSurvey() {
       q1: finalAnswers[1] || '',
       q2: finalAnswers[2] || '',
       q3: finalAnswers[3] || '',
-      q4: Array.isArray(finalAnswers[4]) ? finalAnswers[4].join(' | ') : finalAnswers[4] || '',
+      q4: finalAnswers[4] || '',
       q5: finalAnswers[5] || '',
       q6: finalAnswers[6] || '',
     }
@@ -146,7 +149,6 @@ function SubscriptionSurvey() {
   const transitionToThankYouRef = useRef(null)
 
   const current = questions[currentStep]
-  const totalQuestions = questions.length
   const currentAnswer = answers[current.id]
 
   const hasAnswer = (() => {
@@ -154,28 +156,38 @@ function SubscriptionSurvey() {
     return currentAnswer !== undefined && currentAnswer !== ''
   })()
 
-  const shouldShowQ6 = (answer) => ['Unsure', 'Unlikely', 'Very unlikely'].includes(answer)
-
+  // Only multi-select and text need an explicit Next/Submit button
   const showButton = current.type === 'multi' || current.type === 'text'
-  const isFinalStep = currentStep === questions.length - 1
   const showBackButton = currentStep > 0 && !showThankYou
 
+  // ─── Progress calculation ───
+  // Total visible steps depends on whether Q4 and Q6 are shown
+  const visibleStepCount = (() => {
+    let count = 4 // Q1, Q2, Q3, Q5 always shown
+    if (shouldShowQ4(answers)) count++ // Q4 conditional
+    if (shouldShowQ6(answers[5])) count++ // Q6 conditional
+    return count
+  })()
+
+  // Map currentStep index to visible step number
+  const visibleStepNumber = (() => {
+    if (currentStep <= STEP_Q3) return currentStep + 1
+    if (currentStep === STEP_Q4) return shouldShowQ4(answers) ? 4 : null
+    if (currentStep === STEP_Q5) return shouldShowQ4(answers) ? 5 : 4
+    if (currentStep === STEP_Q6) return shouldShowQ4(answers) ? 6 : 5
+    return currentStep + 1
+  })()
+
+  const progressLabel = showThankYou ? 'Complete!' : `${visibleStepNumber} of ${visibleStepCount}`
+  const progressPercent = showThankYou ? 100 : (visibleStepNumber / visibleStepCount) * 100
+
+  // Button label
   const buttonText = (() => {
-    if (isFinalStep) return 'Submit'
-    if (currentStep === 4 && currentAnswer && !shouldShowQ6(currentAnswer)) return 'Submit'
+    if (currentStep === STEP_Q6) return 'Submit'
+    if (currentStep === STEP_Q5) {
+      if (currentAnswer && !shouldShowQ6(currentAnswer)) return 'Submit'
+    }
     return 'Next'
-  })()
-
-  const progressLabel = (() => {
-    if (showThankYou) return 'Complete!'
-    if (current.conditional && currentStep === questions.length - 1) return 'Complete!'
-    return `${currentStep + 1} of ${totalQuestions}`
-  })()
-
-  const progressPercent = (() => {
-    if (showThankYou) return 100
-    if (current.conditional && currentStep === questions.length - 1) return 100
-    return ((currentStep + 1) / totalQuestions) * 100
   })()
 
   // Initial sheet submission on mount
@@ -189,7 +201,6 @@ function SubscriptionSurvey() {
   // ─── Staggered entrance animation ───
   useLayoutEffect(() => {
     if (showThankYou) return
-
     const items = getAnimItems(formAreaRef.current)
     const btn = submitWrapRef.current
 
@@ -203,7 +214,6 @@ function SubscriptionSurvey() {
     if (btn) {
       tl.to(btn, { opacity: 1, y: 0, filter: 'blur(0px)', duration: DURATION_IN, ease: 'buttery' }, items.length * STAGGER_IN + 0.02)
     }
-
     return () => tl.kill()
   }, [currentStep, showThankYou])
 
@@ -215,16 +225,14 @@ function SubscriptionSurvey() {
     setShowThankYou(true)
   }, [isAnimating, showThankYou])
 
-  // ─── Animate thank-you overlay once it mounts ───
+  // ─── Animate thank-you overlay ───
   useEffect(() => {
     if (!showThankYou || !thankYouRef.current) return
-
     const tyItems = getAnimItems(thankYouRef.current)
     gsap.set(thankYouRef.current, { opacity: 0 })
     gsap.set(tyItems, { opacity: 0, y: 24, filter: 'blur(10px)' })
 
     const tl = gsap.timeline({ onComplete: () => setIsAnimating(false) })
-
     if (surveyContainerRef.current) {
       tl.to(surveyContainerRef.current, { opacity: 0, scale: 0.97, filter: 'blur(6px)', duration: 0.7, ease: 'power2.inOut' }, 0)
     }
@@ -232,20 +240,14 @@ function SubscriptionSurvey() {
     tyItems.forEach((el, i) => {
       tl.to(el, { opacity: 1, y: 0, filter: 'blur(0px)', duration: 0.7, ease: 'buttery' }, 0.4 + i * 0.12)
     })
-
     return () => tl.kill()
   }, [showThankYou])
 
-  // ─── Transition forward ───
-  const transitionToStep = useCallback((nextStep) => {
-    if (isAnimating) return
-    setIsAnimating(true)
-    setError('')
-
+  // ─── Animate out forward ───
+  const animateOut = useCallback((nextStep) => {
     const items = getAnimItems(formAreaRef.current)
     const btn = submitWrapRef.current
     const allEls = btn ? [...items, btn] : items
-
     const tl = gsap.timeline({
       onComplete: () => { setCurrentStep(nextStep); setIsAnimating(false) }
     })
@@ -253,7 +255,15 @@ function SubscriptionSurvey() {
     reversed.forEach((el, i) => {
       tl.to(el, { opacity: 0, y: -10, filter: 'blur(6px)', duration: DURATION_OUT, ease: 'smooth' }, i * STAGGER_OUT)
     })
-  }, [isAnimating])
+  }, [])
+
+  // ─── Transition forward ───
+  const transitionToStep = useCallback((nextStep) => {
+    if (isAnimating) return
+    setIsAnimating(true)
+    setError('')
+    animateOut(nextStep)
+  }, [isAnimating, animateOut])
 
   // ─── Transition backward ───
   const transitionToPrevStep = useCallback(() => {
@@ -266,15 +276,18 @@ function SubscriptionSurvey() {
       autoAdvanceTimer.current = null
     }
 
+    // From Q5: go back to Q4 if it was shown, otherwise Q3
+    let prevStep = currentStep - 1
+    if (currentStep === STEP_Q5 && !shouldShowQ4(answersRef.current)) {
+      prevStep = STEP_Q3
+    }
+
     const items = getAnimItems(formAreaRef.current)
     const btn = submitWrapRef.current
     const allEls = btn ? [...items, btn] : items
-    const prevStep = currentStep - 1
-
     const tl = gsap.timeline({
       onComplete: () => { setCurrentStep(prevStep); setIsAnimating(false) }
     })
-    // Animate out downward so it feels like going back
     const reversed = [...allEls].reverse()
     reversed.forEach((el, i) => {
       tl.to(el, { opacity: 0, y: 10, filter: 'blur(6px)', duration: DURATION_OUT, ease: 'smooth' }, i * STAGGER_OUT)
@@ -304,22 +317,34 @@ function SubscriptionSurvey() {
       autoAdvanceTimer.current = null
       submitToSheet(updated)
 
-      const nextStep = currentStep + 1
-      const nextQuestion = questions[nextStep]
-
-      if (nextQuestion && nextQuestion.conditional) {
-        if (!shouldShowQ6(option)) {
-          transitionToThankYouRef.current?.()
-          return
+      // Leaving Q3: show Q4 only if answer triggers it, otherwise skip to Q5
+      if (currentStep === STEP_Q3) {
+        if (shouldShowQ4(updated)) {
+          transitionToStepRef.current?.(STEP_Q4)
+        } else {
+          transitionToStepRef.current?.(STEP_Q5)
         }
-      }
-
-      if (currentStep >= questions.length - 1) {
-        transitionToThankYouRef.current?.()
         return
       }
 
-      transitionToStepRef.current?.(nextStep)
+      // Q4 always advances to Q5
+      if (currentStep === STEP_Q4) {
+        transitionToStepRef.current?.(STEP_Q5)
+        return
+      }
+
+      // Leaving Q5: show Q6 if triggered, otherwise thank you
+      if (currentStep === STEP_Q5) {
+        if (shouldShowQ6(option)) {
+          transitionToStepRef.current?.(STEP_Q6)
+        } else {
+          transitionToThankYouRef.current?.()
+        }
+        return
+      }
+
+      // Default: advance to next step
+      transitionToStepRef.current?.(currentStep + 1)
     }, 350)
   }, [current.id, isAnimating, currentStep, submitToSheet, updateUrlParams])
 
@@ -348,7 +373,7 @@ function SubscriptionSurvey() {
     updateUrlParams(updated)
   }
 
-  // ─── Submit / Next ───
+  // ─── Submit / Next (multi-select and text questions) ───
   const handleSubmit = useCallback(() => {
     if (isAnimating || showThankYou) return
 
@@ -362,26 +387,26 @@ function SubscriptionSurvey() {
       return
     }
     setError('')
-
     submitToSheet(answersRef.current)
 
-    if (isFinalStep) {
+    // Q6 is the last possible step
+    if (currentStep === STEP_Q6) {
       transitionToThankYou()
       return
     }
 
-    const nextStep = currentStep + 1
-    const nextQuestion = questions[nextStep]
-
-    if (nextQuestion && nextQuestion.conditional) {
-      if (!shouldShowQ6(currentAnswer)) {
+    // Q5 multi/text: check if Q6 should show
+    if (currentStep === STEP_Q5) {
+      if (shouldShowQ6(currentAnswer)) {
+        transitionToStep(STEP_Q6)
+      } else {
         transitionToThankYou()
-        return
       }
+      return
     }
 
-    transitionToStep(nextStep)
-  }, [hasAnswer, isFinalStep, isAnimating, showThankYou, currentStep, currentAnswer, transitionToStep, transitionToThankYou, submitToSheet])
+    transitionToStep(currentStep + 1)
+  }, [hasAnswer, isAnimating, showThankYou, currentStep, currentAnswer, transitionToStep, transitionToThankYou, submitToSheet])
 
   // Enter key
   useEffect(() => {
@@ -476,7 +501,7 @@ function SubscriptionSurvey() {
                 </div>
               </div>
 
-              {/* Bottom row: back button left, next/submit right */}
+              {/* Bottom row: back left, next/submit right */}
               <div className="survey-bottom-row">
                 <button
                   className={`back-btn ${showBackButton ? 'visible' : ''}`}
