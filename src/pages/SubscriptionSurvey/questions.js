@@ -37,7 +37,8 @@ export const questions = [
   {
     id: 4,
     question: "What about the scent isn't quite right for you?",
-    type: 'single',
+    subtitle: 'Select all that apply',
+    type: 'multi',
     // Only shown if Q3 answer indicates dissatisfaction
     conditional: {
       dependsOn: 3,
