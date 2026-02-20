@@ -11,7 +11,6 @@ export const questions = [
       'Very dissatisfied',
     ],
   },
-  // Q2 (delivery frequency) temporarily paused — restore by adding it back here
   {
     id: 3,
     question: 'How happy are you with your current scent?',
