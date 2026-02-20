@@ -36,16 +36,18 @@ export const questions = [
   },
   {
     id: 4,
-    question: 'How would you describe the scent strength?',
-    subtitle: 'Select all that apply',
-    type: 'multi',
+    question: "What about the scent isn't quite right for you?",
+    type: 'single',
+    // Only shown if Q3 answer indicates dissatisfaction
+    conditional: {
+      dependsOn: 3,
+      showIf: ["It's okay", 'Not for me', 'Strongly dislike'],
+    },
     options: [
       'Too strong',
       'Too subtle',
-      'Just right',
-      'Different than expected based off of the description',
       "Doesn't last as long as I hoped",
-      'Lasts longer than expected',
+      'Different than expected',
     ],
   },
   {
@@ -62,7 +64,7 @@ export const questions = [
   },
   {
     id: 6,
-    question: "What's the main reason your unlikely to continue?",
+    question: "What's the main reason you're unlikely to continue?",
     type: 'text',
     conditional: {
       dependsOn: 5,
