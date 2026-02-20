@@ -38,11 +38,11 @@ const shouldShowQ4 = (answers) =>
 const shouldShowQ6 = (answer) =>
   ['Unsure', 'Unlikely', 'Very unlikely'].includes(answer)
 
-// Step constants
-const STEP_Q3 = 2
-const STEP_Q4 = 3
-const STEP_Q5 = 4
-const STEP_Q6 = 5
+// Step index constants (based on questions array positions)
+const STEP_Q3 = 1  // index 1 (Q1 is index 0, Q2 removed)
+const STEP_Q4 = 2
+const STEP_Q5 = 3
+const STEP_Q6 = 4
 
 function getAnimItems(container) {
   if (!container) return []
@@ -113,6 +113,11 @@ function SubscriptionSurvey() {
   const answersRef = useRef(emailPrefill?.answers ?? {})
   useEffect(() => { answersRef.current = answers }, [answers])
 
+  // ─── Set browser tab title ───
+  useEffect(() => {
+    document.title = 'Laundry Sauce Feedback'
+  }, [])
+
   // ─── Update URL params ───
   const updateUrlParams = useCallback((updatedAnswers) => {
     if (!emailPrefill?.email) return
@@ -129,18 +134,21 @@ function SubscriptionSurvey() {
   }, [])
 
   // ─── Submit to Google Sheet ───
+  // Q2 removed — don't submit until Q3 is answered
   const submitToSheet = useCallback((finalAnswers) => {
     if (!emailPrefill?.email) return
+    if (!finalAnswers[3]) return
+
     const payload = {
       sessionId: SESSION_ID,
       email: emailPrefill?.email || '',
       q1: finalAnswers[1] || '',
-      q2: finalAnswers[2] || '',
       q3: finalAnswers[3] || '',
-      q4: finalAnswers[4] || '',
+      q4: Array.isArray(finalAnswers[4]) ? finalAnswers[4].join(' | ') : finalAnswers[4] || '',
       q5: finalAnswers[5] || '',
       q6: finalAnswers[6] || '',
     }
+
     fetch(SHEET_URL, { method: 'POST', body: JSON.stringify(payload) })
       .catch((err) => console.error('Sheet submit error:', err))
   }, [])
@@ -156,37 +164,32 @@ function SubscriptionSurvey() {
     return currentAnswer !== undefined && currentAnswer !== ''
   })()
 
-  // Only multi-select and text need an explicit Next/Submit button
   const showButton = current.type === 'multi' || current.type === 'text'
   const showBackButton = currentStep > 0 && !showThankYou
 
   // ─── Progress calculation ───
-  // Total visible steps depends on whether Q4 and Q6 are shown
   const visibleStepCount = (() => {
-    let count = 4 // Q1, Q2, Q3, Q5 always shown
-    if (shouldShowQ4(answers)) count++ // Q4 conditional
-    if (shouldShowQ6(answers[5])) count++ // Q6 conditional
+    let count = 3 // Q1, Q3, Q5 always shown
+    if (shouldShowQ4(answers)) count++
+    if (shouldShowQ6(answers[5])) count++
     return count
   })()
 
-  // Map currentStep index to visible step number
   const visibleStepNumber = (() => {
-    if (currentStep <= STEP_Q3) return currentStep + 1
-    if (currentStep === STEP_Q4) return shouldShowQ4(answers) ? 4 : null
-    if (currentStep === STEP_Q5) return shouldShowQ4(answers) ? 5 : 4
-    if (currentStep === STEP_Q6) return shouldShowQ4(answers) ? 6 : 5
+    if (currentStep === 0) return 1                                          // Q1
+    if (currentStep === STEP_Q3) return 2                                    // Q3
+    if (currentStep === STEP_Q4) return shouldShowQ4(answers) ? 3 : null    // Q4
+    if (currentStep === STEP_Q5) return shouldShowQ4(answers) ? 4 : 3       // Q5
+    if (currentStep === STEP_Q6) return shouldShowQ4(answers) ? 5 : 4       // Q6
     return currentStep + 1
   })()
 
   const progressLabel = showThankYou ? 'Complete!' : `${visibleStepNumber} of ${visibleStepCount}`
   const progressPercent = showThankYou ? 100 : (visibleStepNumber / visibleStepCount) * 100
 
-  // Button label
   const buttonText = (() => {
     if (currentStep === STEP_Q6) return 'Submit'
-    if (currentStep === STEP_Q5) {
-      if (currentAnswer && !shouldShowQ6(currentAnswer)) return 'Submit'
-    }
+    if (currentStep === STEP_Q5 && currentAnswer && !shouldShowQ6(currentAnswer)) return 'Submit'
     return 'Next'
   })()
 
@@ -243,8 +246,8 @@ function SubscriptionSurvey() {
     return () => tl.kill()
   }, [showThankYou])
 
-  // ─── Animate out forward ───
-  const animateOut = useCallback((nextStep) => {
+  // ─── Animate out helper ───
+  const animateOut = useCallback((nextStep, direction = 'forward') => {
     const items = getAnimItems(formAreaRef.current)
     const btn = submitWrapRef.current
     const allEls = btn ? [...items, btn] : items
@@ -253,7 +256,13 @@ function SubscriptionSurvey() {
     })
     const reversed = [...allEls].reverse()
     reversed.forEach((el, i) => {
-      tl.to(el, { opacity: 0, y: -10, filter: 'blur(6px)', duration: DURATION_OUT, ease: 'smooth' }, i * STAGGER_OUT)
+      tl.to(el, {
+        opacity: 0,
+        y: direction === 'forward' ? -10 : 10,
+        filter: 'blur(6px)',
+        duration: DURATION_OUT,
+        ease: 'smooth'
+      }, i * STAGGER_OUT)
     })
   }, [])
 
@@ -262,7 +271,7 @@ function SubscriptionSurvey() {
     if (isAnimating) return
     setIsAnimating(true)
     setError('')
-    animateOut(nextStep)
+    animateOut(nextStep, 'forward')
   }, [isAnimating, animateOut])
 
   // ─── Transition backward ───
@@ -282,17 +291,8 @@ function SubscriptionSurvey() {
       prevStep = STEP_Q3
     }
 
-    const items = getAnimItems(formAreaRef.current)
-    const btn = submitWrapRef.current
-    const allEls = btn ? [...items, btn] : items
-    const tl = gsap.timeline({
-      onComplete: () => { setCurrentStep(prevStep); setIsAnimating(false) }
-    })
-    const reversed = [...allEls].reverse()
-    reversed.forEach((el, i) => {
-      tl.to(el, { opacity: 0, y: 10, filter: 'blur(6px)', duration: DURATION_OUT, ease: 'smooth' }, i * STAGGER_OUT)
-    })
-  }, [isAnimating, currentStep])
+    animateOut(prevStep, 'backward')
+  }, [isAnimating, currentStep, animateOut])
 
   // Keep refs in sync
   transitionToStepRef.current = transitionToStep
@@ -343,7 +343,6 @@ function SubscriptionSurvey() {
         return
       }
 
-      // Default: advance to next step
       transitionToStepRef.current?.(currentStep + 1)
     }, 350)
   }, [current.id, isAnimating, currentStep, submitToSheet, updateUrlParams])
@@ -373,7 +372,7 @@ function SubscriptionSurvey() {
     updateUrlParams(updated)
   }
 
-  // ─── Submit / Next (multi-select and text questions) ───
+  // ─── Submit / Next ───
   const handleSubmit = useCallback(() => {
     if (isAnimating || showThankYou) return
 
@@ -389,19 +388,23 @@ function SubscriptionSurvey() {
     setError('')
     submitToSheet(answersRef.current)
 
-    // Q6 is the last possible step
     if (currentStep === STEP_Q6) {
       transitionToThankYou()
       return
     }
 
-    // Q5 multi/text: check if Q6 should show
     if (currentStep === STEP_Q5) {
       if (shouldShowQ6(currentAnswer)) {
         transitionToStep(STEP_Q6)
       } else {
         transitionToThankYou()
       }
+      return
+    }
+
+    // Q4 (multi-select): always advance to Q5
+    if (currentStep === STEP_Q4) {
+      transitionToStep(STEP_Q5)
       return
     }
 
