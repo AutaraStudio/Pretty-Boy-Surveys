@@ -11,17 +11,7 @@ export const questions = [
       'Very dissatisfied',
     ],
   },
-  {
-    id: 2,
-    question: 'How does your current delivery frequency feel?',
-    type: 'single',
-    options: [
-      'Just right',
-      'Too frequent',
-      'Not frequent enough',
-      "I'm not sure yet",
-    ],
-  },
+  // Q2 (delivery frequency) temporarily paused — restore by adding it back here
   {
     id: 3,
     question: 'How happy are you with your current scent?',
@@ -39,7 +29,6 @@ export const questions = [
     question: "What about the scent isn't quite right for you?",
     subtitle: 'Select all that apply',
     type: 'multi',
-    // Only shown if Q3 answer indicates dissatisfaction
     conditional: {
       dependsOn: 3,
       showIf: ["It's okay", 'Not for me', 'Strongly dislike'],
