@@ -38,8 +38,8 @@ const shouldShowQ4 = (answers) =>
 const shouldShowQ6 = (answer) =>
   ['Unsure', 'Unlikely', 'Very unlikely'].includes(answer)
 
-// Step index constants (based on questions array positions)
-const STEP_Q3 = 1  // index 1 (Q1 is index 0, Q2 removed)
+// Step index constants (based on questions array positions, Q2 removed)
+const STEP_Q3 = 1
 const STEP_Q4 = 2
 const STEP_Q5 = 3
 const STEP_Q6 = 4
@@ -134,10 +134,9 @@ function SubscriptionSurvey() {
   }, [])
 
   // ─── Submit to Google Sheet ───
-  // Q2 removed — don't submit until Q3 is answered
+  // Fires immediately on mount with just the email, then updates as answers come in
   const submitToSheet = useCallback((finalAnswers) => {
     if (!emailPrefill?.email) return
-    if (!finalAnswers[3]) return
 
     const payload = {
       sessionId: SESSION_ID,
@@ -176,11 +175,11 @@ function SubscriptionSurvey() {
   })()
 
   const visibleStepNumber = (() => {
-    if (currentStep === 0) return 1                                          // Q1
-    if (currentStep === STEP_Q3) return 2                                    // Q3
-    if (currentStep === STEP_Q4) return shouldShowQ4(answers) ? 3 : null    // Q4
-    if (currentStep === STEP_Q5) return shouldShowQ4(answers) ? 4 : 3       // Q5
-    if (currentStep === STEP_Q6) return shouldShowQ4(answers) ? 5 : 4       // Q6
+    if (currentStep === 0) return 1
+    if (currentStep === STEP_Q3) return 2
+    if (currentStep === STEP_Q4) return shouldShowQ4(answers) ? 3 : null
+    if (currentStep === STEP_Q5) return shouldShowQ4(answers) ? 4 : 3
+    if (currentStep === STEP_Q6) return shouldShowQ4(answers) ? 5 : 4
     return currentStep + 1
   })()
 
@@ -193,7 +192,8 @@ function SubscriptionSurvey() {
     return 'Next'
   })()
 
-  // Initial sheet submission on mount
+  // ─── Initial sheet submission on mount ───
+  // Fires as soon as the page loads with an email in the URL
   useEffect(() => {
     if (emailPrefill?.email) {
       submitToSheet(emailPrefill.answers)
