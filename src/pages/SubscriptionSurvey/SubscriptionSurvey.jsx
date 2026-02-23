@@ -34,9 +34,9 @@ const SESSION_ID = Math.random().toString(36).substring(2) + Date.now().toString
 const shouldShowQ4 = (answers) =>
   ["It's okay", 'Not for me', 'Strongly dislike'].includes(answers[3])
 
-// Q6 only shows if Q5 indicates unlikely to continue
+// Q6 only shows if Q5 is Unlikely or Very unlikely (Unsure no longer triggers it)
 const shouldShowQ6 = (answer) =>
-  ['Unsure', 'Unlikely', 'Very unlikely'].includes(answer)
+  ['Unlikely', 'Very unlikely'].includes(answer)
 
 // Step index constants (based on questions array positions, Q2 removed)
 const STEP_Q3 = 1
@@ -134,7 +134,6 @@ function SubscriptionSurvey() {
   }, [])
 
   // ─── Submit to Google Sheet ───
-  // Fires immediately on mount with just the email, then updates as answers come in
   const submitToSheet = useCallback((finalAnswers) => {
     if (!emailPrefill?.email) return
 
@@ -163,7 +162,8 @@ function SubscriptionSurvey() {
     return currentAnswer !== undefined && currentAnswer !== ''
   })()
 
-  const showButton = current.type === 'multi' || current.type === 'text'
+  // Q4 (multi) is the only question that needs an explicit Next button now
+  const showButton = current.type === 'multi'
   const showBackButton = currentStep > 0 && !showThankYou
 
   // ─── Progress calculation ───
@@ -186,14 +186,7 @@ function SubscriptionSurvey() {
   const progressLabel = showThankYou ? 'Complete!' : `${visibleStepNumber} of ${visibleStepCount}`
   const progressPercent = showThankYou ? 100 : (visibleStepNumber / visibleStepCount) * 100
 
-  const buttonText = (() => {
-    if (currentStep === STEP_Q6) return 'Submit'
-    if (currentStep === STEP_Q5 && currentAnswer && !shouldShowQ6(currentAnswer)) return 'Submit'
-    return 'Next'
-  })()
-
   // ─── Initial sheet submission on mount ───
-  // Fires as soon as the page loads with an email in the URL
   useEffect(() => {
     if (emailPrefill?.email) {
       submitToSheet(emailPrefill.answers)
@@ -317,19 +310,13 @@ function SubscriptionSurvey() {
       autoAdvanceTimer.current = null
       submitToSheet(updated)
 
-      // Leaving Q3: show Q4 only if answer triggers it, otherwise skip to Q5
+      // Leaving Q3: show Q4 if triggered, otherwise skip to Q5
       if (currentStep === STEP_Q3) {
         if (shouldShowQ4(updated)) {
           transitionToStepRef.current?.(STEP_Q4)
         } else {
           transitionToStepRef.current?.(STEP_Q5)
         }
-        return
-      }
-
-      // Q4 always advances to Q5
-      if (currentStep === STEP_Q4) {
-        transitionToStepRef.current?.(STEP_Q5)
         return
       }
 
@@ -340,6 +327,12 @@ function SubscriptionSurvey() {
         } else {
           transitionToThankYouRef.current?.()
         }
+        return
+      }
+
+      // Q6 is the last question — always go to thank you
+      if (currentStep === STEP_Q6) {
+        transitionToThankYouRef.current?.()
         return
       }
 
@@ -363,16 +356,7 @@ function SubscriptionSurvey() {
     })
   }
 
-  // ─── Text input ───
-  const handleTextChange = (value) => {
-    setError('')
-    const updated = { ...answersRef.current, [current.id]: value }
-    answersRef.current = updated
-    setAnswers(updated)
-    updateUrlParams(updated)
-  }
-
-  // ─── Submit / Next ───
+  // ─── Submit / Next (multi-select only now) ───
   const handleSubmit = useCallback(() => {
     if (isAnimating || showThankYou) return
 
@@ -388,20 +372,6 @@ function SubscriptionSurvey() {
     setError('')
     submitToSheet(answersRef.current)
 
-    if (currentStep === STEP_Q6) {
-      transitionToThankYou()
-      return
-    }
-
-    if (currentStep === STEP_Q5) {
-      if (shouldShowQ6(currentAnswer)) {
-        transitionToStep(STEP_Q6)
-      } else {
-        transitionToThankYou()
-      }
-      return
-    }
-
     // Q4 (multi-select): always advance to Q5
     if (currentStep === STEP_Q4) {
       transitionToStep(STEP_Q5)
@@ -409,7 +379,7 @@ function SubscriptionSurvey() {
     }
 
     transitionToStep(currentStep + 1)
-  }, [hasAnswer, isAnimating, showThankYou, currentStep, currentAnswer, transitionToStep, transitionToThankYou, submitToSheet])
+  }, [hasAnswer, isAnimating, showThankYou, currentStep, transitionToStep, submitToSheet])
 
   // Enter key
   useEffect(() => {
@@ -487,24 +457,13 @@ function SubscriptionSurvey() {
                         </label>
                       )
                     })}
-
-                    {/* Text */}
-                    {current.type === 'text' && (
-                      <textarea
-                        className="option-textarea"
-                        placeholder="Type your answer here..."
-                        rows={5}
-                        value={currentAnswer || ''}
-                        onChange={(e) => handleTextChange(e.target.value)}
-                      />
-                    )}
                   </div>
 
                   <div className={`error-tooltip ${error ? 'visible' : ''}`}>{error}</div>
                 </div>
               </div>
 
-              {/* Bottom row: back left, next/submit right */}
+              {/* Bottom row: back left, next right (multi only) */}
               <div className="survey-bottom-row">
                 <button
                   className={`back-btn ${showBackButton ? 'visible' : ''}`}
@@ -518,7 +477,7 @@ function SubscriptionSurvey() {
                 {showButton && (
                   <div ref={submitWrapRef} className="survey-submit">
                     <button className="submit-btn" onClick={handleSubmit}>
-                      {buttonText}
+                      Next
                     </button>
                   </div>
                 )}
