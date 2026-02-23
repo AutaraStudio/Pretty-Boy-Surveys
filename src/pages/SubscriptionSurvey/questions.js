@@ -53,11 +53,18 @@ export const questions = [
   },
   {
     id: 6,
-    question: "What's the main reason you're unlikely to continue?",
-    type: 'text',
+    question: "What's the main reason you're unlikely to continue your subscription?",
+    type: 'single',
+    // Only shown if Q5 is Unlikely or Very unlikely (not Unsure)
     conditional: {
       dependsOn: 5,
-      showIf: ['Unsure', 'Unlikely', 'Very unlikely'],
+      showIf: ['Unlikely', 'Very unlikely'],
     },
+    options: [
+      'Price feels too high',
+      'Not using it enough',
+      "The scent isn't right",
+      'Prefer to buy when I need it',
+    ],
   },
 ]
