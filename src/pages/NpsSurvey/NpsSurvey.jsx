@@ -61,13 +61,11 @@ function getVisibleQuestions(answers, npsScore) {
   return questions.filter((q) => evalCondition(q.showIf, npsScore, answers))
 }
 
-// Collect all .anim-item elements inside a container
 function getAnimItems(container) {
   if (!container) return []
   return Array.from(container.querySelectorAll('.anim-item'))
 }
 
-// Back arrow icon — the provided SVG flipped horizontally
 function BackIcon() {
   return (
     <svg
@@ -154,7 +152,6 @@ function NpsSurvey() {
   const npsScore = answers[1]
   const visibleQuestions_ = getVisibleQuestions(answers, npsScore)
   const current = visibleQuestions_[currentStep]
-  const thankyouIndex = visibleQuestions_.findIndex(q => q.type === 'thankyou')
 
   // Track last survey question so form stays rendered during thank you crossfade
   const lastSurveyQ = useRef(null)
@@ -170,7 +167,6 @@ function NpsSurvey() {
     return currentAnswer !== undefined && currentAnswer !== ''
   })()
 
-  // Show button only on text/slider slides (scale auto-advances)
   const showButton = current?.type === 'text' || current?.type === 'slider'
   const showBackButton = currentStep > 0 && !showThankYou
 
@@ -236,7 +232,6 @@ function NpsSurvey() {
     const freshVisible = getVisibleQuestions(currentAnswers, currentNps)
     const nextQuestion = freshVisible[nextStep]
 
-    // Thank you → use dedicated crossfade
     if (nextQuestion?.type === 'thankyou') {
       setIsAnimating(false)
       transitionToThankYou(nextStep)
@@ -296,7 +291,6 @@ function NpsSurvey() {
     setAnswers(updated)
     updateUrlParams(updated)
 
-    // Submit progress on every answer (sheet will update row via session ID)
     submitToSheet(updated)
 
     autoAdvanceTimer.current = setTimeout(() => {
@@ -309,7 +303,6 @@ function NpsSurvey() {
     }, 80)
   }, [current?.id, isAnimating, currentStep, transitionToStep, submitToSheet, updateUrlParams])
 
-  // Clean up auto-advance timer
   useEffect(() => {
     return () => { if (autoAdvanceTimer.current) clearTimeout(autoAdvanceTimer.current) }
   }, [])
@@ -451,7 +444,7 @@ function NpsSurvey() {
           <img src={tyData.image} alt="" className="thankyou-bg" />
           <div className="thankyou-overlay" />
           <div className="thankyou-content">
-            <div className="anim-item"><Logo className="thankyou-logo" /></div>
+            <div className="anim-item"><Logo className="thankyou-logo" variant="white" /></div>
             <h1 className="anim-item thankyou-heading" dangerouslySetInnerHTML={{ __html: tyData.heading }} />
             <p className="anim-item thankyou-body">{tyData.body}</p>
           </div>

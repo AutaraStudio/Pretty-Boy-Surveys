@@ -23,8 +23,6 @@ const THANK_YOU = {
   image: '/images/subscription/thank-you-page.webp',
   heading: 'Thank you for<br>your feedback!',
   body: 'Your responses help us make PrettyBoy even better.',
-  linkText: 'Scent Quiz',
-  linkUrl: 'https://laundrysauce.com/pages/quiz#step=1',
 }
 
 // ─── Unique session ID generated once per page visit ───
@@ -149,7 +147,6 @@ function SubscriptionSurvey() {
 
   const hasAnswer = currentAnswer !== undefined && currentAnswer !== ''
 
-  // All questions are single-select and auto-advance — no explicit Next button needed
   const showBackButton = currentStep > 0 && !showThankYou
 
   // ─── Progress calculation ───
@@ -372,11 +369,9 @@ function SubscriptionSurvey() {
           <img src={THANK_YOU.image} alt="" className="thankyou-bg" />
           <div className="thankyou-overlay" />
           <div className="thankyou-content">
-            <div className="anim-item"><Logo className="thankyou-logo" /></div>
+            <div className="anim-item"><Logo className="thankyou-logo" variant="white" /></div>
             <h1 className="anim-item thankyou-heading" dangerouslySetInnerHTML={{ __html: THANK_YOU.heading }} />
-            <p className="anim-item thankyou-body">
-              {THANK_YOU.body}
-            </p>
+            <p className="anim-item thankyou-body">{THANK_YOU.body}</p>
           </div>
         </div>
       )}
