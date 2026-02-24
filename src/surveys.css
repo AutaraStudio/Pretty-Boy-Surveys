@@ -203,8 +203,7 @@
   background: var(--color-surface);
   color: var(--color-text);
   font-family: var(--font-body);
-  font-size: clamp(14px, 1.05vw, 16px);
-  font-weight: 400;
+font-size: clamp(16px, 1.4vw, 20px);  font-weight: 400;
   resize: none;
   outline: none;
   line-height: 1.6;
@@ -625,8 +624,7 @@
 
 .sub-survey .option-btn {
   width: 100%;
-  padding: clamp(14px, 1.3vw, 18px) clamp(22px, 2vw, 30px);
-  border: 1px solid var(--color-border);
+padding: clamp(10px, 0.9vw, 13px) clamp(22px, 2vw, 30px);  border: 1px solid var(--color-border);
   border-radius: var(--radius-pill);
   background: var(--color-surface);
   color: var(--color-text);
@@ -851,8 +849,8 @@
   }
 
   .sub-survey .option-btn {
-    padding: clamp(14px, 3.5vw, 18px) clamp(20px, 4vw, 28px);
-    font-size: clamp(14px, 3.8vw, 16px);
+   padding: clamp(10px, 2.5vw, 13px) clamp(20px, 4vw, 28px);
+font-size: clamp(16px, 4vw, 20px);
   }
 
   .sub-survey .option-checkbox {
