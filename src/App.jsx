@@ -2,7 +2,7 @@ import { Routes, Route } from 'react-router-dom'
 import NpsSurvey from './pages/NpsSurvey/NpsSurvey'
 import SubscriptionSurvey from './pages/SubscriptionSurvey/SubscriptionSurvey'
 import './App.css'
-import './surveys.css'
+
 
 
 function App() {
