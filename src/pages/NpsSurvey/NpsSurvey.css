@@ -1,4 +1,4 @@
-/* Deacon Condensed Bold — headings/questions */
+/* ─── Fonts ─── */
 @font-face {
   font-family: 'DeaconCondensed-Bold';
   src: url('/fonts/DeaconCondensed-Bold.otf') format('opentype');
@@ -7,7 +7,6 @@
   font-display: block;
 }
 
-/* ABC Diatype Condensed — body/inputs/buttons */
 @font-face {
   font-family: 'ABCDiatypeCondensed';
   src: url('/fonts/ABCDiatypeCondensed-regular.otf') format('opentype');
@@ -16,32 +15,35 @@
   font-display: block;
 }
 
+/* ─── Tokens ─── */
 .nps-survey {
-  --color-primary: #0C2340;
-  --color-primary-hover: #0e2b4e;
-  --color-bg: #A8C6DC;
-  --color-surface: #ffffff;
-  --color-surface-hover: #f0f4f8;
-  --color-border: #D8D6D2;
-  --color-border-hover: #B0ADA8;
-  --color-text: #0C2340;
-  --color-text-muted: #8A8580;
-  --color-text-light: #6A6560;
-  --color-error: #E53E3E;
-  --color-black: #0C2340;
-  --radius-pill: 0px;
-  --radius-box: 0px;
+  --color-primary:        #0C2340;
+  --color-primary-hover:  rgba(12, 35, 64, 0.85);
+  --color-bg:             #A8C6DC;
+  --color-surface:        #ffffff;
+  --color-surface-hover:  rgba(255, 255, 255, 0.65);
+  --color-border:         rgba(12, 35, 64, 0.25);
+  --color-border-hover:   rgba(12, 35, 64, 0.55);
+  --color-text:           #0C2340;
+  --color-text-muted:     rgba(12, 35, 64, 0.5);
+  --color-text-light:     rgba(12, 35, 64, 0.35);
+  --color-error:          #E53E3E;
+  --color-black:          #0C2340;
+  --radius-pill:          0px;
+  --radius-box:           6px;
+  --radius-btn:           6px;
   --font-heading: 'DeaconCondensed-Bold', 'Arial Narrow', 'Impact', sans-serif;
-  --font-body: 'ABCDiatypeCondensed', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-body:    'ABCDiatypeCondensed', -apple-system, BlinkMacSystemFont, sans-serif;
 }
-/* Layout */
+
+/* ─── Layout ─── */
 .nps-survey .survey-container {
   display: flex;
   height: 100vh;
   width: 100vw;
 }
 
-/* LEFT - Image */
+/* LEFT — Image */
 .nps-survey .survey-image-panel {
   position: relative;
   width: 50%;
@@ -52,10 +54,8 @@
 
 .nps-survey .survey-image {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
   object-fit: cover;
   will-change: transform;
   transform: translateZ(0);
@@ -63,7 +63,7 @@
   backface-visibility: hidden;
 }
 
-/* RIGHT - Form */
+/* RIGHT — Form */
 .nps-survey .survey-form-panel {
   width: 50%;
   height: 100%;
@@ -84,7 +84,7 @@
 }
 
 .nps-survey .survey-logo {
-  width: clamp(200px, 18vw, 280px);
+  width: clamp(160px, 15vw, 240px);
   height: auto;
   color: var(--color-text);
 }
@@ -107,12 +107,11 @@
   display: none;
 }
 
-/* Content wrapper */
 .nps-survey .survey-content {
   width: 100%;
 }
 
-/* ─── Staggered animation items ─── */
+/* ─── Animation items ─── */
 .nps-survey .anim-item {
   will-change: opacity, transform, filter;
   transform: translateZ(0);
@@ -120,36 +119,37 @@
   backface-visibility: hidden;
 }
 
+/* ─── Question & copy ─── */
 .nps-survey .survey-question {
   font-family: var(--font-heading);
-  font-size: clamp(40px, 4.5vw, 62px);
+  font-size: clamp(24px, 2.5vw, 32px);
   font-weight: 700;
   color: var(--color-text);
-  line-height: 0.95;
+  line-height: 1.1;
   width: 100%;
-  margin-bottom: clamp(28px, 3vw, 44px);
+  margin-bottom: clamp(20px, 2.2vw, 32px);
   text-transform: uppercase;
   letter-spacing: 0.01em;
 }
 
 .nps-survey .survey-subtitle {
   font-family: var(--font-body);
-  font-size: clamp(15px, 1.2vw, 18px);
+  font-size: clamp(14px, 1.1vw, 17px);
   color: var(--color-text);
   font-weight: 400;
   line-height: 1.5;
-  margin-top: clamp(-16px, -1.5vw, -24px);
+  margin-top: clamp(-12px, -1.2vw, -18px);
   margin-bottom: clamp(8px, 0.8vw, 12px);
 }
 
 .nps-survey .survey-description {
   font-family: var(--font-body);
-  font-size: clamp(13px, 1vw, 15px);
+  font-size: clamp(13px, 0.95vw, 15px);
   font-weight: 400;
   color: var(--color-text-muted);
   line-height: 1.6;
   width: 100%;
-  margin-bottom: clamp(24px, 2.5vw, 36px);
+  margin-bottom: clamp(20px, 2.2vw, 32px);
 }
 
 .nps-survey .survey-options {
@@ -159,62 +159,60 @@
   width: 100%;
 }
 
-/* Textarea */
+/* ─── Textarea ─── */
 .nps-survey .option-textarea {
   width: 100%;
-  padding: clamp(16px, 1.4vw, 22px);
+  padding: clamp(14px, 1.3vw, 20px);
   border: 1.5px solid var(--color-border);
   border-radius: var(--radius-box);
   background: var(--color-surface);
   color: var(--color-text);
   font-family: var(--font-body);
-  font-size: clamp(14px, 1.1vw, 16px);
+  font-size: clamp(14px, 1.05vw, 16px);
   font-weight: 400;
   resize: none;
   outline: none;
   line-height: 1.6;
-  transition: border-color 0.3s ease;
+  transition: border-color 0.25s ease;
   min-height: 140px;
 }
 
 .nps-survey .option-textarea::placeholder {
   color: var(--color-text-muted);
-  opacity: 0.6;
 }
 
 .nps-survey .option-textarea:focus {
-  border-color: var(--color-text);
+  border-color: var(--color-primary);
 }
 
-/* Submit / Next Button */
+/* ─── Submit / Next button ─── */
 .nps-survey .survey-submit {
   will-change: opacity, transform, filter;
   transform: translateZ(0);
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
-  padding-top: clamp(28px, 3vw, 44px);
+  padding-top: clamp(24px, 2.5vw, 40px);
   flex-shrink: 0;
 }
 
 .nps-survey .submit-btn {
-  padding: clamp(16px, 1.4vw, 20px) clamp(40px, 4vw, 56px);
-  background: var(--color-black);
+  padding: clamp(14px, 1.3vw, 18px) clamp(36px, 3.5vw, 52px);
+  background: var(--color-primary);
   color: #fff;
   border: none;
-  border-radius: 6px;
+  border-radius: var(--radius-btn);
   font-family: var(--font-body);
-  font-size: clamp(12px, 1vw, 14px);
+  font-size: clamp(12px, 0.95vw, 14px);
   font-weight: 500;
-  letter-spacing: 3px;
+  letter-spacing: 2.5px;
   text-transform: uppercase;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
-  width: auto;
+  transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
   display: block;
 }
 
 .nps-survey .submit-btn:hover {
-  background: #333;
+  background: var(--color-primary-hover);
   transform: translateY(-1px);
 }
 
@@ -224,7 +222,7 @@
   transform: none;
 }
 
-/* Error Tooltip */
+/* ─── Error tooltip ─── */
 .nps-survey .survey-options-wrapper {
   position: relative;
   width: 100%;
@@ -240,11 +238,11 @@
   font-size: 12px;
   font-weight: 500;
   padding: 6px 14px;
-  border-radius: var(--radius-box);
+  border-radius: var(--radius-btn);
   white-space: nowrap;
   opacity: 0;
   transform: translateY(-4px);
-  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
   pointer-events: none;
 }
 
@@ -264,30 +262,30 @@
   transform: rotate(45deg);
 }
 
-/* Number Scale */
+/* ─── NPS Number Scale ─── */
 .nps-survey .scale-container {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
   width: 100%;
 }
 
 .nps-survey .scale-buttons {
   display: flex;
-  gap: 10px;
+  gap: 8px;
   width: 100%;
 }
 
 .nps-survey .scale-btn {
   flex: 1;
   aspect-ratio: 1;
-  max-height: 62px;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-box);
-  background: var(--color-surface);
+  max-height: 58px;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-btn);
+  background: transparent;
   color: var(--color-text);
   font-family: var(--font-body);
-  font-size: clamp(14px, 1.2vw, 17px);
+  font-size: clamp(13px, 1.1vw, 16px);
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.22, 1, 0.36, 1);
@@ -298,9 +296,9 @@
 }
 
 .nps-survey .scale-btn:hover {
-  color: var(--color-surface);
-  background: var(--color-text);
-  border-color: var(--color-text);
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: #fff;
   transform: translateY(-1px);
 }
 
@@ -311,9 +309,9 @@
 }
 
 .nps-survey .scale-btn.in-range {
-  background: var(--color-surface-hover);
+  background: rgba(12, 35, 64, 0.12);
   border-color: var(--color-border-hover);
-  color: var(--color-text-light);
+  color: var(--color-text);
 }
 
 .nps-survey .scale-labels {
@@ -334,8 +332,7 @@
 /* ─── Thank You Screen ─── */
 .nps-survey .thankyou-screen {
   position: fixed;
-  top: 0;
-  left: 0;
+  top: 0; left: 0;
   width: 100vw;
   height: 100vh;
   z-index: 100;
@@ -348,21 +345,17 @@
 
 .nps-survey .thankyou-bg {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
   object-fit: cover;
   z-index: 0;
 }
 
 .nps-survey .thankyou-overlay {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.65);
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(12, 35, 64, 0.6);
   z-index: 1;
 }
 
@@ -378,25 +371,25 @@
 }
 
 .nps-survey .thankyou-logo {
-  width: clamp(200px, 18vw, 280px);
+  width: clamp(160px, 15vw, 240px);
   height: auto;
   color: #fff;
-  margin-bottom: clamp(20px, 2.5vw, 40px);
+  margin-bottom: clamp(16px, 2vw, 32px);
 }
 
 .nps-survey .thankyou-heading {
   font-family: var(--font-heading);
-  font-size: clamp(36px, 4.5vw, 68px);
+  font-size: clamp(32px, 4vw, 56px);
   font-weight: 700;
   color: #fff;
-  line-height: 0.95;
+  line-height: 1.0;
   text-transform: uppercase;
   letter-spacing: 0.01em;
 }
 
 .nps-survey .thankyou-body {
   font-family: var(--font-body);
-  font-size: clamp(14px, 1.1vw, 17px);
+  font-size: clamp(14px, 1.05vw, 17px);
   font-weight: 400;
   color: rgba(255, 255, 255, 0.8);
   line-height: 1.55;
@@ -411,10 +404,56 @@
 }
 
 .nps-survey .thankyou-body a:hover {
-  opacity: 0.8;
+  opacity: 0.75;
 }
 
-/* Mobile */
+/* ─── Bottom row: back + submit ─── */
+.survey-bottom-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: clamp(24px, 2.5vw, 40px);
+  flex-shrink: 0;
+  min-height: 60px;
+}
+
+.back-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-btn);
+  background: transparent;
+  color: var(--color-text);
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+  flex-shrink: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.back-btn.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.back-btn:hover {
+  background: var(--color-surface-hover);
+  border-color: var(--color-border-hover);
+  transform: translateY(-1px);
+}
+
+.back-btn:active {
+  transform: translateY(0);
+}
+
+.survey-bottom-row .survey-submit {
+  padding-top: 0;
+}
+
+/* ─── Mobile ─── */
 @media (max-width: 768px) {
   .nps-survey .survey-image-panel {
     display: none;
@@ -452,7 +491,7 @@
   }
 
   .nps-survey .survey-question {
-    font-size: clamp(30px, 9vw, 44px);
+    font-size: clamp(20px, 6vw, 32px);
     text-align: left;
     max-width: 100%;
   }
@@ -470,8 +509,7 @@
   }
 
   .nps-survey .scale-btn {
-    font-size: clamp(12px, 2.8vw, 14px);
-    border-radius: var(--radius-box);
+    font-size: clamp(11px, 2.6vw, 14px);
     aspect-ratio: 1;
     min-height: unset;
     max-height: unset;
@@ -490,58 +528,7 @@
   .nps-survey .submit-btn {
     width: 100%;
     text-align: center;
-    padding: clamp(18px, 4.5vw, 22px) 0;
+    padding: clamp(16px, 4.5vw, 20px) 0;
     font-size: clamp(13px, 3.5vw, 15px);
   }
-}
-
-/* ─── Back Button + Bottom Row ─── */
-/* Add this block to the bottom of both SubscriptionSurvey.css and NpsSurvey.css */
-
-.survey-bottom-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-top: clamp(28px, 3vw, 44px);
-  flex-shrink: 0;
-  min-height: 60px;
-}
-
-.back-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 44px;
-  border: 1.5px solid var(--color-border);
-  border-radius: 6px;
-  background: transparent;
-  color: var(--color-text);
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
-  flex-shrink: 0;
-  /* Hidden by default — shown only when .visible is applied */
-  opacity: 0;
-  pointer-events: none;
-}
-
-.back-btn.visible {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-.back-btn:hover {
-  background: var(--color-surface);
-  border-color: var(--color-border-hover);
-  transform: translateY(-1px);
-}
-
-.back-btn:active {
-  transform: translateY(0);
-}
-
-/* Move existing survey-submit padding into the bottom row context */
-/* Remove the standalone padding-top from .survey-submit if it conflicts */
-.survey-bottom-row .survey-submit {
-  padding-top: 0;
 }

@@ -1,4 +1,4 @@
-/* Deacon Condensed Bold — headings/questions */
+/* ─── Fonts ─── */
 @font-face {
   font-family: 'DeaconCondensed-Bold';
   src: url('/fonts/DeaconCondensed-Bold.otf') format('opentype');
@@ -7,7 +7,6 @@
   font-display: block;
 }
 
-/* ABC Diatype Condensed — body/inputs/buttons */
 @font-face {
   font-family: 'ABCDiatypeCondensed';
   src: url('/fonts/ABCDiatypeCondensed-regular.otf') format('opentype');
@@ -16,26 +15,28 @@
   font-display: block;
 }
 
+/* ─── Tokens ─── */
 .sub-survey {
-  --color-primary: #0C2340;
-  --color-primary-hover: #0e2b4e;
-  --color-bg: #A8C6DC;
-  --color-surface: #ffffff;
-  --color-surface-hover: #f0f4f8;
-  --color-border: #D8D6D2;
-  --color-border-hover: #B0ADA8;
-  --color-text: #0C2340;
-  --color-text-muted: #8A8580;
-  --color-text-light: #6A6560;
-  --color-error: #E53E3E;
-  --color-black: #0C2340;
-  --radius-pill: 50px;
-  --radius-box: 10px;
+  --color-primary:        #0C2340;
+  --color-primary-hover:  rgba(12, 35, 64, 0.85);
+  --color-bg:             #A8C6DC;
+  --color-surface:        #ffffff;
+  --color-surface-hover:  rgba(255, 255, 255, 0.65);
+  --color-border:         rgba(12, 35, 64, 0.25);
+  --color-border-hover:   rgba(12, 35, 64, 0.55);
+  --color-text:           #0C2340;
+  --color-text-muted:     rgba(12, 35, 64, 0.5);
+  --color-text-light:     rgba(12, 35, 64, 0.35);
+  --color-error:          #E53E3E;
+  --color-black:          #0C2340;
+  --radius-pill:          50px;
+  --radius-box:           10px;
+  --radius-btn:           6px;
   --font-heading: 'DeaconCondensed-Bold', 'Arial Narrow', 'Impact', sans-serif;
-  --font-body: 'ABCDiatypeCondensed', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-body:    'ABCDiatypeCondensed', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
-/* Layout */
+/* ─── Layout ─── */
 .sub-survey .survey-container {
   display: flex;
   height: 100vh;
@@ -43,7 +44,7 @@
   will-change: opacity, transform, filter;
 }
 
-/* LEFT - Image */
+/* LEFT — Image */
 .sub-survey .survey-image-panel {
   position: relative;
   width: 50%;
@@ -54,10 +55,8 @@
 
 .sub-survey .survey-image {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
   object-fit: cover;
   will-change: transform;
   transform: translateZ(0);
@@ -65,7 +64,7 @@
   backface-visibility: hidden;
 }
 
-/* RIGHT - Form */
+/* RIGHT — Form */
 .sub-survey .survey-form-panel {
   width: 50%;
   height: 100%;
@@ -86,12 +85,12 @@
 }
 
 .sub-survey .survey-logo {
-  width: clamp(200px, 18vw, 280px);
+  width: clamp(160px, 15vw, 240px);
   height: auto;
   color: var(--color-text);
 }
 
-/* Vertically centers everything below the logo */
+/* Vertically centres everything below the logo */
 .sub-survey .survey-form-center {
   width: 100%;
   max-width: 440px;
@@ -102,6 +101,7 @@
   overflow: hidden;
 }
 
+/* ─── Progress bar ─── */
 .sub-survey .survey-progress-wrapper {
   width: 100%;
   margin-bottom: clamp(24px, 2.5vw, 36px);
@@ -127,12 +127,12 @@
 
 .sub-survey .survey-progress-fill {
   height: 100%;
-  background: var(--color-text);
+  background: var(--color-primary);
   border-radius: 3px;
   transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/* Scrollable form area */
+/* ─── Scrollable form area ─── */
 .sub-survey .survey-form-scroll {
   width: 100%;
   display: flex;
@@ -147,12 +147,11 @@
   display: none;
 }
 
-/* Content wrapper */
 .sub-survey .survey-content {
   width: 100%;
 }
 
-/* ─── Staggered animation items ─── */
+/* ─── Animation items ─── */
 .sub-survey .anim-item {
   will-change: opacity, transform, filter;
   transform: translateZ(0);
@@ -160,24 +159,27 @@
   backface-visibility: hidden;
 }
 
+/* ─── Question & copy ─── */
 .sub-survey .survey-question {
-  font-family: var(--font-body);
-  font-size: clamp(20px, 2vw, 28px);
-  font-weight: 500;
+  font-family: var(--font-heading);
+  font-size: clamp(24px, 2.5vw, 32px);
+  font-weight: 700;
   color: var(--color-text);
-  line-height: 1.4;
+  line-height: 1.1;
   width: 100%;
-  margin-bottom: clamp(24px, 2.5vw, 36px);
+  margin-bottom: clamp(20px, 2.2vw, 32px);
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
 }
 
 .sub-survey .survey-subtitle {
   font-family: var(--font-body);
-  font-size: clamp(13px, 1vw, 15px);
+  font-size: clamp(13px, 0.95vw, 15px);
   color: var(--color-text-muted);
   font-weight: 400;
   line-height: 1.5;
-  margin-top: clamp(-16px, -1.5vw, -24px);
-  margin-bottom: clamp(20px, 2vw, 28px);
+  margin-top: clamp(-12px, -1.2vw, -18px);
+  margin-bottom: clamp(16px, 1.8vw, 24px);
 }
 
 .sub-survey .survey-options {
@@ -187,33 +189,35 @@
   width: 100%;
 }
 
-/* Single Select Buttons — Pill style */
+/* ─── Single Select Pills ─── */
 .sub-survey .option-btn {
   width: 100%;
-  padding: clamp(15px, 1.4vw, 20px) clamp(24px, 2vw, 32px);
-  border: none;
+  padding: clamp(14px, 1.3vw, 18px) clamp(22px, 2vw, 30px);
+  border: 1.5px solid var(--color-border);
   border-radius: var(--radius-pill);
   background: var(--color-surface);
   color: var(--color-text);
   font-family: var(--font-body);
-  font-size: clamp(14px, 1.1vw, 16px);
+  font-size: clamp(14px, 1.05vw, 16px);
   font-weight: 400;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
   text-align: center;
 }
 
 .sub-survey .option-btn:hover {
-  background: var(--color-surface-hover);
+  background: var(--color-surface);
+  border-color: var(--color-primary);
   transform: translateY(-1px);
 }
 
 .sub-survey .option-btn.selected {
   background: var(--color-primary);
   color: #fff;
+  border-color: var(--color-primary);
 }
 
-/* Multi Select Checkboxes */
+/* ─── Multi Select Checkboxes ─── */
 .sub-survey .option-checkbox {
   display: flex;
   align-items: center;
@@ -224,9 +228,9 @@
   border: none;
   border-radius: 0;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
   font-family: var(--font-body);
-  font-size: clamp(14px, 1.1vw, 16px);
+  font-size: clamp(14px, 1.05vw, 16px);
   color: var(--color-text-light);
 }
 
@@ -251,13 +255,13 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
   color: transparent;
 }
 
 .sub-survey .option-checkbox.selected .check-indicator {
-  background: var(--color-text);
-  border-color: var(--color-text);
+  background: var(--color-primary);
+  border-color: var(--color-primary);
   color: #fff;
 }
 
@@ -280,62 +284,60 @@
   font-weight: 500;
 }
 
-/* Textarea */
+/* ─── Textarea ─── */
 .sub-survey .option-textarea {
   width: 100%;
-  padding: clamp(16px, 1.4vw, 22px);
+  padding: clamp(14px, 1.3vw, 20px);
   border: 1.5px solid var(--color-border);
   border-radius: var(--radius-box);
   background: var(--color-surface);
   color: var(--color-text);
   font-family: var(--font-body);
-  font-size: clamp(14px, 1.1vw, 16px);
+  font-size: clamp(14px, 1.05vw, 16px);
   font-weight: 400;
   resize: none;
   outline: none;
   line-height: 1.6;
-  transition: border-color 0.3s ease;
+  transition: border-color 0.25s ease;
   min-height: 140px;
 }
 
 .sub-survey .option-textarea::placeholder {
   color: var(--color-text-muted);
-  opacity: 0.6;
 }
 
 .sub-survey .option-textarea:focus {
-  border-color: var(--color-text);
+  border-color: var(--color-primary);
 }
 
-/* Submit / Next Button */
+/* ─── Submit / Next button ─── */
 .sub-survey .survey-submit {
   will-change: opacity, transform, filter;
   transform: translateZ(0);
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
-  padding-top: clamp(28px, 3vw, 44px);
+  padding-top: clamp(24px, 2.5vw, 40px);
   flex-shrink: 0;
 }
 
 .sub-survey .submit-btn {
-  padding: clamp(16px, 1.4vw, 20px) clamp(40px, 4vw, 56px);
-  background: var(--color-black);
+  padding: clamp(14px, 1.3vw, 18px) clamp(36px, 3.5vw, 52px);
+  background: var(--color-primary);
   color: #fff;
   border: none;
-  border-radius: 6px;
+  border-radius: var(--radius-btn);
   font-family: var(--font-body);
-  font-size: clamp(12px, 1vw, 14px);
+  font-size: clamp(12px, 0.95vw, 14px);
   font-weight: 500;
-  letter-spacing: 3px;
+  letter-spacing: 2.5px;
   text-transform: uppercase;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
-  width: auto;
+  transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
   display: block;
 }
 
 .sub-survey .submit-btn:hover {
-  background: #333;
+  background: var(--color-primary-hover);
   transform: translateY(-1px);
 }
 
@@ -345,7 +347,7 @@
   transform: none;
 }
 
-/* Error Tooltip */
+/* ─── Error tooltip ─── */
 .sub-survey .survey-options-wrapper {
   position: relative;
   width: 100%;
@@ -361,11 +363,11 @@
   font-size: 12px;
   font-weight: 500;
   padding: 6px 14px;
-  border-radius: var(--radius-box);
+  border-radius: var(--radius-btn);
   white-space: nowrap;
   opacity: 0;
   transform: translateY(-4px);
-  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
   pointer-events: none;
 }
 
@@ -388,8 +390,7 @@
 /* ─── Thank You Screen ─── */
 .sub-survey .thankyou-screen {
   position: fixed;
-  top: 0;
-  left: 0;
+  top: 0; left: 0;
   width: 100vw;
   height: 100vh;
   z-index: 100;
@@ -402,21 +403,17 @@
 
 .sub-survey .thankyou-bg {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
   object-fit: cover;
   z-index: 0;
 }
 
 .sub-survey .thankyou-overlay {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.65);
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(12, 35, 64, 0.6);
   z-index: 1;
 }
 
@@ -432,23 +429,25 @@
 }
 
 .sub-survey .thankyou-logo {
-  width: clamp(200px, 18vw, 280px);
+  width: clamp(160px, 15vw, 240px);
   height: auto;
   color: #fff;
-  margin-bottom: clamp(20px, 2.5vw, 40px);
+  margin-bottom: clamp(16px, 2vw, 32px);
 }
 
 .sub-survey .thankyou-heading {
-  font-family: var(--font-body);
-  font-size: clamp(20px, 2vw, 28px);
-  font-weight: 500;
+  font-family: var(--font-heading);
+  font-size: clamp(32px, 4vw, 56px);
+  font-weight: 700;
   color: #fff;
-  line-height: 1.4;
+  line-height: 1.0;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
 }
 
 .sub-survey .thankyou-body {
   font-family: var(--font-body);
-  font-size: clamp(14px, 1.1vw, 17px);
+  font-size: clamp(14px, 1.05vw, 17px);
   font-weight: 400;
   color: rgba(255, 255, 255, 0.8);
   line-height: 1.55;
@@ -463,12 +462,56 @@
 }
 
 .sub-survey .thankyou-body a:hover {
-  opacity: 0.8;
+  opacity: 0.75;
 }
 
-/* ===================== */
-/* MOBILE               */
-/* ===================== */
+/* ─── Bottom row: back + submit ─── */
+.survey-bottom-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: clamp(24px, 2.5vw, 40px);
+  flex-shrink: 0;
+  min-height: 60px;
+}
+
+.back-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-btn);
+  background: transparent;
+  color: var(--color-text);
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+  flex-shrink: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.back-btn.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.back-btn:hover {
+  background: var(--color-surface-hover);
+  border-color: var(--color-border-hover);
+  transform: translateY(-1px);
+}
+
+.back-btn:active {
+  transform: translateY(0);
+}
+
+.survey-bottom-row .survey-submit {
+  padding-top: 0;
+}
+
+/* ─── Mobile ─── */
 @media (max-width: 768px) {
   .sub-survey .survey-image-panel {
     display: none;
@@ -502,7 +545,7 @@
   }
 
   .sub-survey .survey-question {
-    font-size: clamp(20px, 5.5vw, 28px);
+    font-size: clamp(20px, 6vw, 32px);
     text-align: center;
   }
 
@@ -527,66 +570,15 @@
   .sub-survey .submit-btn {
     width: 100%;
     text-align: center;
-    padding: clamp(18px, 4.5vw, 22px) 0;
+    padding: clamp(16px, 4.5vw, 20px) 0;
     font-size: clamp(13px, 3.5vw, 15px);
   }
 
   .sub-survey .thankyou-heading {
-    font-size: clamp(20px, 5.5vw, 28px);
+    font-size: clamp(28px, 6vw, 40px);
   }
 
   .sub-survey .thankyou-content {
     padding: 24px;
   }
-}
-
-/* ─── Back Button + Bottom Row ─── */
-/* Add this block to the bottom of both SubscriptionSurvey.css and NpsSurvey.css */
-
-.survey-bottom-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-top: clamp(28px, 3vw, 44px);
-  flex-shrink: 0;
-  min-height: 60px;
-}
-
-.back-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 44px;
-  border: 1.5px solid var(--color-border);
-  border-radius: 6px;
-  background: transparent;
-  color: var(--color-text);
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
-  flex-shrink: 0;
-  /* Hidden by default — shown only when .visible is applied */
-  opacity: 0;
-  pointer-events: none;
-}
-
-.back-btn.visible {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-.back-btn:hover {
-  background: var(--color-surface);
-  border-color: var(--color-border-hover);
-  transform: translateY(-1px);
-}
-
-.back-btn:active {
-  transform: translateY(0);
-}
-
-/* Move existing survey-submit padding into the bottom row context */
-/* Remove the standalone padding-top from .survey-submit if it conflicts */
-.survey-bottom-row .survey-submit {
-  padding-top: 0;
 }
