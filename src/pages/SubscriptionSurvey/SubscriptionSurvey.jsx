@@ -22,7 +22,7 @@ const SHEET_URL = 'https://script.google.com/macros/s/AKfycbyhliXUiqU8dGP21BpcTW
 const THANK_YOU = {
   image: '/images/subscription/thank-you-page.webp',
   heading: 'Thank you for<br>your feedback!',
-  body: 'Your responses help us make Laundry Sauce even better.',
+  body: 'Your responses help us make PrettyBoy even better.',
   linkText: 'Scent Quiz',
   linkUrl: 'https://laundrysauce.com/pages/quiz#step=1',
 }
@@ -30,19 +30,14 @@ const THANK_YOU = {
 // ─── Unique session ID generated once per page visit ───
 const SESSION_ID = Math.random().toString(36).substring(2) + Date.now().toString(36)
 
-// Q4 only shows if Q3 answer indicates dissatisfaction
-const shouldShowQ4 = (answers) =>
-  ["It's okay", 'Not for me', 'Strongly dislike'].includes(answers[3])
+// Q3 (conditional) only shows if Q2 answer is Unsure, Unlikely, or Very unlikely
+const shouldShowQ3 = (answer) =>
+  ['Unsure', 'Unlikely', 'Very unlikely'].includes(answer)
 
-// Q6 only shows if Q5 is Unlikely or Very unlikely (Unsure no longer triggers it)
-const shouldShowQ6 = (answer) =>
-  ['Unlikely', 'Very unlikely'].includes(answer)
-
-// Step index constants (based on questions array positions, Q2 removed)
-const STEP_Q3 = 1
-const STEP_Q4 = 2
-const STEP_Q5 = 3
-const STEP_Q6 = 4
+// Step index constants
+const STEP_Q1 = 0
+const STEP_Q2 = 1
+const STEP_Q3 = 2
 
 function getAnimItems(container) {
   if (!container) return []
@@ -105,7 +100,6 @@ function SubscriptionSurvey() {
   const [showThankYou, setShowThankYou] = useState(false)
 
   const formAreaRef = useRef(null)
-  const submitWrapRef = useRef(null)
   const thankYouRef = useRef(null)
   const surveyContainerRef = useRef(null)
   const autoAdvanceTimer = useRef(null)
@@ -115,7 +109,7 @@ function SubscriptionSurvey() {
 
   // ─── Set browser tab title ───
   useEffect(() => {
-    document.title = 'Laundry Sauce Feedback'
+    document.title = 'PrettyBoy Feedback'
   }, [])
 
   // ─── Update URL params ───
@@ -124,9 +118,7 @@ function SubscriptionSurvey() {
     const params = new URLSearchParams()
     params.set('email', emailPrefill.email)
     Object.entries(updatedAnswers).forEach(([qId, value]) => {
-      if (Array.isArray(value)) {
-        params.set(`q${qId}`, value.join(','))
-      } else if (value !== undefined && value !== '') {
+      if (value !== undefined && value !== '') {
         params.set(`q${qId}`, value)
       }
     })
@@ -141,10 +133,8 @@ function SubscriptionSurvey() {
       sessionId: SESSION_ID,
       email: emailPrefill?.email || '',
       q1: finalAnswers[1] || '',
+      q2: finalAnswers[2] || '',
       q3: finalAnswers[3] || '',
-      q4: Array.isArray(finalAnswers[4]) ? finalAnswers[4].join(' | ') : finalAnswers[4] || '',
-      q5: finalAnswers[5] || '',
-      q6: finalAnswers[6] || '',
     }
 
     fetch(SHEET_URL, { method: 'POST', body: JSON.stringify(payload) })
@@ -157,29 +147,18 @@ function SubscriptionSurvey() {
   const current = questions[currentStep]
   const currentAnswer = answers[current.id]
 
-  const hasAnswer = (() => {
-    if (current.type === 'multi') return currentAnswer && currentAnswer.length > 0
-    return currentAnswer !== undefined && currentAnswer !== ''
-  })()
+  const hasAnswer = currentAnswer !== undefined && currentAnswer !== ''
 
-  // Q4 (multi) is the only question that needs an explicit Next button now
-  const showButton = current.type === 'multi'
+  // All questions are single-select and auto-advance — no explicit Next button needed
   const showBackButton = currentStep > 0 && !showThankYou
 
   // ─── Progress calculation ───
-  const visibleStepCount = (() => {
-    let count = 3 // Q1, Q3, Q5 always shown
-    if (shouldShowQ4(answers)) count++
-    if (shouldShowQ6(answers[5])) count++
-    return count
-  })()
+  const visibleStepCount = shouldShowQ3(answers[2]) ? 3 : 2
 
   const visibleStepNumber = (() => {
-    if (currentStep === 0) return 1
-    if (currentStep === STEP_Q3) return 2
-    if (currentStep === STEP_Q4) return shouldShowQ4(answers) ? 3 : null
-    if (currentStep === STEP_Q5) return shouldShowQ4(answers) ? 4 : 3
-    if (currentStep === STEP_Q6) return shouldShowQ4(answers) ? 5 : 4
+    if (currentStep === STEP_Q1) return 1
+    if (currentStep === STEP_Q2) return 2
+    if (currentStep === STEP_Q3) return 3
     return currentStep + 1
   })()
 
@@ -198,18 +177,13 @@ function SubscriptionSurvey() {
   useLayoutEffect(() => {
     if (showThankYou) return
     const items = getAnimItems(formAreaRef.current)
-    const btn = submitWrapRef.current
 
     gsap.set(items, { opacity: 0, y: 18, filter: 'blur(8px)' })
-    if (btn) gsap.set(btn, { opacity: 0, y: 14, filter: 'blur(6px)' })
 
     const tl = gsap.timeline({ delay: 0.08 })
     items.forEach((el, i) => {
       tl.to(el, { opacity: 1, y: 0, filter: 'blur(0px)', duration: DURATION_IN, ease: 'buttery' }, i * STAGGER_IN)
     })
-    if (btn) {
-      tl.to(btn, { opacity: 1, y: 0, filter: 'blur(0px)', duration: DURATION_IN, ease: 'buttery' }, items.length * STAGGER_IN + 0.02)
-    }
     return () => tl.kill()
   }, [currentStep, showThankYou])
 
@@ -242,12 +216,10 @@ function SubscriptionSurvey() {
   // ─── Animate out helper ───
   const animateOut = useCallback((nextStep, direction = 'forward') => {
     const items = getAnimItems(formAreaRef.current)
-    const btn = submitWrapRef.current
-    const allEls = btn ? [...items, btn] : items
     const tl = gsap.timeline({
       onComplete: () => { setCurrentStep(nextStep); setIsAnimating(false) }
     })
-    const reversed = [...allEls].reverse()
+    const reversed = [...items].reverse()
     reversed.forEach((el, i) => {
       tl.to(el, {
         opacity: 0,
@@ -278,13 +250,7 @@ function SubscriptionSurvey() {
       autoAdvanceTimer.current = null
     }
 
-    // From Q5: go back to Q4 if it was shown, otherwise Q3
-    let prevStep = currentStep - 1
-    if (currentStep === STEP_Q5 && !shouldShowQ4(answersRef.current)) {
-      prevStep = STEP_Q3
-    }
-
-    animateOut(prevStep, 'backward')
+    animateOut(currentStep - 1, 'backward')
   }, [isAnimating, currentStep, animateOut])
 
   // Keep refs in sync
@@ -310,94 +276,33 @@ function SubscriptionSurvey() {
       autoAdvanceTimer.current = null
       submitToSheet(updated)
 
-      // Leaving Q3: show Q4 if triggered, otherwise skip to Q5
-      if (currentStep === STEP_Q3) {
-        if (shouldShowQ4(updated)) {
-          transitionToStepRef.current?.(STEP_Q4)
-        } else {
-          transitionToStepRef.current?.(STEP_Q5)
-        }
-        return
-      }
-
-      // Leaving Q5: show Q6 if triggered, otherwise thank you
-      if (currentStep === STEP_Q5) {
-        if (shouldShowQ6(option)) {
-          transitionToStepRef.current?.(STEP_Q6)
+      // Leaving Q2: show Q3 if triggered, otherwise thank you
+      if (currentStep === STEP_Q2) {
+        if (shouldShowQ3(option)) {
+          transitionToStepRef.current?.(STEP_Q3)
         } else {
           transitionToThankYouRef.current?.()
         }
         return
       }
 
-      // Q6 is the last question — always go to thank you
-      if (currentStep === STEP_Q6) {
+      // Q3 is the last question — always go to thank you
+      if (currentStep === STEP_Q3) {
         transitionToThankYouRef.current?.()
         return
       }
 
+      // Default: advance to next step
       transitionToStepRef.current?.(currentStep + 1)
     }, 350)
   }, [current.id, isAnimating, currentStep, submitToSheet, updateUrlParams])
 
-  // ─── Multi select toggle ───
-  const handleMultiToggle = (option) => {
-    if (isAnimating) return
-    setError('')
-    setAnswers(prev => {
-      const existing = prev[current.id] || []
-      const updated = existing.includes(option)
-        ? existing.filter(o => o !== option)
-        : [...existing, option]
-      const newAnswers = { ...prev, [current.id]: updated }
-      answersRef.current = newAnswers
-      updateUrlParams(newAnswers)
-      return newAnswers
-    })
-  }
-
-  // ─── Submit / Next (multi-select only now) ───
-  const handleSubmit = useCallback(() => {
-    if (isAnimating || showThankYou) return
-
-    if (autoAdvanceTimer.current) {
-      clearTimeout(autoAdvanceTimer.current)
-      autoAdvanceTimer.current = null
-    }
-
-    if (!hasAnswer && !current.conditional) {
-      setError('Please complete this question before continuing')
-      return
-    }
-    setError('')
-    submitToSheet(answersRef.current)
-
-    // Q4 (multi-select): always advance to Q5
-    if (currentStep === STEP_Q4) {
-      transitionToStep(STEP_Q5)
-      return
-    }
-
-    transitionToStep(currentStep + 1)
-  }, [hasAnswer, isAnimating, showThankYou, currentStep, transitionToStep, submitToSheet])
-
-  // Enter key
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === 'Enter' && !showThankYou && showButton) {
-        e.preventDefault()
-        handleSubmit()
-      }
-    }
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [handleSubmit, showThankYou, showButton])
-
-  useEffect(() => { setError('') }, [currentStep])
-
+  // Cleanup auto-advance timer on unmount
   useEffect(() => {
     return () => { if (autoAdvanceTimer.current) clearTimeout(autoAdvanceTimer.current) }
   }, [])
+
+  useEffect(() => { setError('') }, [currentStep])
 
   return (
     <div className="sub-survey">
@@ -430,9 +335,7 @@ function SubscriptionSurvey() {
 
                 <div className="anim-item survey-options-wrapper">
                   <div className="survey-options">
-
-                    {/* Single Select */}
-                    {current.type === 'single' && current.options.map((opt) => (
+                    {current.options.map((opt) => (
                       <button
                         key={opt}
                         className={`option-btn ${currentAnswer === opt ? 'selected' : ''}`}
@@ -441,29 +344,13 @@ function SubscriptionSurvey() {
                         {opt}
                       </button>
                     ))}
-
-                    {/* Multi Select */}
-                    {current.type === 'multi' && current.options.map((opt) => {
-                      const isChecked = (currentAnswer || []).includes(opt)
-                      return (
-                        <label key={opt} className={`option-checkbox ${isChecked ? 'selected' : ''}`}>
-                          <input type="checkbox" checked={isChecked} onChange={() => handleMultiToggle(opt)} />
-                          <span className="check-indicator">
-                            <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
-                              <path d="M1 4L3.5 6.5L9 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                            </svg>
-                          </span>
-                          <span className="checkbox-label-text">{opt}</span>
-                        </label>
-                      )
-                    })}
                   </div>
 
                   <div className={`error-tooltip ${error ? 'visible' : ''}`}>{error}</div>
                 </div>
               </div>
 
-              {/* Bottom row: back left, next right (multi only) */}
+              {/* Bottom row: back button only */}
               <div className="survey-bottom-row">
                 <button
                   className={`back-btn ${showBackButton ? 'visible' : ''}`}
@@ -473,14 +360,6 @@ function SubscriptionSurvey() {
                 >
                   <BackIcon />
                 </button>
-
-                {showButton && (
-                  <div ref={submitWrapRef} className="survey-submit">
-                    <button className="submit-btn" onClick={handleSubmit}>
-                      Next
-                    </button>
-                  </div>
-                )}
               </div>
             </div>
           </div>
@@ -496,8 +375,7 @@ function SubscriptionSurvey() {
             <div className="anim-item"><Logo className="thankyou-logo" /></div>
             <h1 className="anim-item thankyou-heading" dangerouslySetInnerHTML={{ __html: THANK_YOU.heading }} />
             <p className="anim-item thankyou-body">
-              {THANK_YOU.body}<br />
-              Get started with our <a href={THANK_YOU.linkUrl}>{THANK_YOU.linkText}</a>!
+              {THANK_YOU.body}
             </p>
           </div>
         </div>
