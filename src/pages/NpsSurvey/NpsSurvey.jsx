@@ -104,6 +104,11 @@ function NpsSurvey() {
     answersRef.current = answers
   }, [answers])
 
+  // ─── Set browser tab title ───
+  useEffect(() => {
+    document.title = 'PrettyBoy Feedback'
+  }, [])
+
   // ─── Update URL params ───
   const updateUrlParams = useCallback((updatedAnswers) => {
     if (!initial.email) return
@@ -270,7 +275,6 @@ function NpsSurvey() {
     const tl = gsap.timeline({
       onComplete: () => { setCurrentStep(prevStep); setIsAnimating(false) }
     })
-    // Animate out downward so it feels like going back
     const reversed = [...allEls].reverse()
     reversed.forEach((el, i) => {
       tl.to(el, { opacity: 0, y: 10, filter: 'blur(6px)', duration: DURATION_OUT, ease: 'smooth' }, i * STAGGER_OUT)
@@ -449,10 +453,7 @@ function NpsSurvey() {
           <div className="thankyou-content">
             <div className="anim-item"><Logo className="thankyou-logo" /></div>
             <h1 className="anim-item thankyou-heading" dangerouslySetInnerHTML={{ __html: tyData.heading }} />
-            <p className="anim-item thankyou-body">
-              {tyData.body}<br />
-              Get started with our <a href={tyData.linkUrl}>{tyData.linkText}</a>!
-            </p>
+            <p className="anim-item thankyou-body">{tyData.body}</p>
           </div>
         </div>
       )}

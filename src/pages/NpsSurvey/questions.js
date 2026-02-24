@@ -1,7 +1,7 @@
 export const questions = [
   {
     id: 1,
-    question: 'How likely are<br>you to recommend<br>Laundry Sauce to<br>a friend?',
+    question: 'How likely are<br>you to recommend<br>PrettyBoy to<br>a friend?',
     type: 'scale',
     min: 0,
     max: 10,
@@ -11,7 +11,7 @@ export const questions = [
   {
     id: 2,
     question: 'Awesome!',
-    subtitle: 'What do you love most about Laundry Sauce?',
+    subtitle: 'What do you love most about PrettyBoy?',
     description: "We'd love to know what stood out or made your experience great.",
     type: 'text',
     placeholder: 'Tell us what you love...',
@@ -39,8 +39,6 @@ export const questions = [
     image: '/images/nps/thank-you-page.webp',
     type: 'thankyou',
     heading: 'Thank you for<br>your feedback!',
-    body: 'Want to discover your new favorite scent?',
-    linkText: 'Scent Quiz',
-    linkUrl: 'https://laundrysauce.com',
+    body: 'Your responses help us make PrettyBoy even better.',
   },
 ]
