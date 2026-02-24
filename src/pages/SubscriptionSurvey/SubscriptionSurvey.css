@@ -482,7 +482,7 @@
   padding: clamp(10px, 0.9vw, 13px) clamp(22px, 2vw, 30px);
   border: none;
   border-radius: var(--radius-pill);
-  background: transparent;
+  background: rgba(238, 243, 247, 0.75);
   color: var(--color-text);
   font-family: var(--font-body);
   font-size: clamp(16px, 1.4vw, 20px);
