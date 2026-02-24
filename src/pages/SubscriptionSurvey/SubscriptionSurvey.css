@@ -32,7 +32,7 @@
   --color-primary:        #0C2340;
   --color-primary-hover:  rgba(12, 35, 64, 0.85);
   --color-bg:             #A8C6DC;
-  --color-surface:        #ffffff;
+  --color-surface:        #EEF3F7;
   --color-surface-hover:  rgba(255, 255, 255, 0.65);
   --color-border:         rgba(12, 35, 64, 0.25);
   --color-border-hover:   rgba(12, 35, 64, 0.55);
@@ -480,9 +480,9 @@
 .sub-survey .option-btn {
   width: 100%;
   padding: clamp(10px, 0.9vw, 13px) clamp(22px, 2vw, 30px);
-  border: 1px solid var(--color-border);
+  border: none;
   border-radius: var(--radius-pill);
-  background: var(--color-surface);
+  background: transparent;
   color: var(--color-text);
   font-family: var(--font-body);
   font-size: clamp(16px, 1.4vw, 20px);
@@ -493,8 +493,7 @@
 }
 
 .sub-survey .option-btn:hover {
-  border-color: var(--color-primary);
-  transform: translateY(-1px);
+  background: var(--color-surface);
 }
 
 .sub-survey .option-btn.selected {
@@ -502,7 +501,6 @@
   color: #fff;
   border-color: var(--color-primary);
 }
-
 
 /* ─────────────────────────────────────────────
    MOBILE
