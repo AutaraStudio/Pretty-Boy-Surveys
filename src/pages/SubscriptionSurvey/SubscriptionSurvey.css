@@ -1,6 +1,5 @@
 /* ============================================================
-   surveys.css — Pretty Boy Surveys
-   Shared stylesheet for NPS (/nps) and Subscription (/subscription)
+   SubscriptionSurvey.css — Pretty Boy Subscription Survey (/subscription)
    ============================================================ */
 
 
@@ -29,7 +28,6 @@
    DESIGN TOKENS
 ───────────────────────────────────────────── */
 
-.nps-survey,
 .sub-survey {
   --color-primary:        #0C2340;
   --color-primary-hover:  rgba(12, 35, 64, 0.85);
@@ -50,18 +48,11 @@
   --font-body:    'ABCDiatypeCondensed', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
-/* NPS has square pill/box (no rounded options) */
-.nps-survey {
-  --radius-pill: 0px;
-  --radius-box:  0px;
-}
-
 
 /* ─────────────────────────────────────────────
-   SHARED LAYOUT
+   LAYOUT
 ───────────────────────────────────────────── */
 
-.nps-survey .survey-container,
 .sub-survey .survey-container {
   display: flex;
   height: 100vh;
@@ -69,7 +60,6 @@
 }
 
 /* LEFT — Image panel */
-.nps-survey .survey-image-panel,
 .sub-survey .survey-image-panel {
   position: relative;
   width: 50%;
@@ -78,7 +68,6 @@
   background: #000;
 }
 
-.nps-survey .survey-image,
 .sub-survey .survey-image {
   position: absolute;
   top: 0; left: 0;
@@ -91,7 +80,6 @@
 }
 
 /* RIGHT — Form panel */
-.nps-survey .survey-form-panel,
 .sub-survey .survey-form-panel {
   width: 50%;
   height: 100%;
@@ -105,15 +93,15 @@
   overflow: hidden;
 }
 
-.nps-survey .survey-logo-wrapper {
-  max-width: 540px;
-}
-
+/* Logo */
 .sub-survey .survey-logo-wrapper {
+  width: 100%;
   max-width: 400px;
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
 }
 
-.nps-survey .survey-logo,
 .sub-survey .survey-logo {
   display: block;
   width: clamp(60px, 6vw, 90px);
@@ -122,10 +110,9 @@
 
 
 /* ─────────────────────────────────────────────
-   SHARED ANIMATION ITEMS
+   ANIMATION ITEMS
 ───────────────────────────────────────────── */
 
-.nps-survey .anim-item,
 .sub-survey .anim-item {
   will-change: opacity, transform, filter;
   transform: translateZ(0);
@@ -135,20 +122,8 @@
 
 
 /* ─────────────────────────────────────────────
-   SHARED TYPOGRAPHY — Questions & Copy
+   TYPOGRAPHY
 ───────────────────────────────────────────── */
-
-.nps-survey .survey-question {
-  font-family: var(--font-heading);
-  font-size: clamp(40px, 4.5vw, 62px);
-  font-weight: 700;
-  color: var(--color-text);
-  line-height: 0.95;
-  width: 100%;
-  margin-bottom: clamp(28px, 3vw, 44px);
-  text-transform: uppercase;
-  letter-spacing: 0.01em;
-}
 
 .sub-survey .survey-question {
   font-family: var(--font-heading);
@@ -162,7 +137,6 @@
   letter-spacing: 0.01em;
 }
 
-.nps-survey .survey-subtitle,
 .sub-survey .survey-subtitle {
   font-family: var(--font-body);
   font-size: clamp(16px, 1.4vw, 20px);
@@ -173,7 +147,6 @@
   margin-bottom: clamp(8px, 0.8vw, 12px);
 }
 
-.nps-survey .survey-description,
 .sub-survey .survey-description {
   font-family: var(--font-body);
   font-size: clamp(16px, 1.4vw, 20px);
@@ -184,7 +157,6 @@
   margin-bottom: clamp(24px, 2.5vw, 36px);
 }
 
-.nps-survey .survey-options,
 .sub-survey .survey-options {
   display: flex;
   flex-direction: column;
@@ -194,10 +166,9 @@
 
 
 /* ─────────────────────────────────────────────
-   SHARED — Textarea
+   TEXTAREA
 ───────────────────────────────────────────── */
 
-.nps-survey .option-textarea,
 .sub-survey .option-textarea {
   width: 100%;
   padding: clamp(14px, 1.3vw, 20px);
@@ -215,22 +186,19 @@
   min-height: 140px;
 }
 
-.nps-survey .option-textarea::placeholder,
 .sub-survey .option-textarea::placeholder {
   color: var(--color-text-muted);
 }
 
-.nps-survey .option-textarea:focus,
 .sub-survey .option-textarea:focus {
   border-color: var(--color-primary);
 }
 
 
 /* ─────────────────────────────────────────────
-   SHARED — Submit / Next button
+   SUBMIT BUTTON
 ───────────────────────────────────────────── */
 
-.nps-survey .survey-submit,
 .sub-survey .survey-submit {
   will-change: opacity, transform, filter;
   transform: translateZ(0);
@@ -240,7 +208,6 @@
   flex-shrink: 0;
 }
 
-.nps-survey .submit-btn,
 .sub-survey .submit-btn {
   padding: clamp(14px, 1.3vw, 18px) clamp(36px, 3.5vw, 52px);
   background: var(--color-primary);
@@ -257,13 +224,11 @@
   display: block;
 }
 
-.nps-survey .submit-btn:hover,
 .sub-survey .submit-btn:hover {
   background: var(--color-primary-hover);
   transform: translateY(-1px);
 }
 
-.nps-survey .submit-btn:disabled,
 .sub-survey .submit-btn:disabled {
   opacity: 0.4;
   cursor: not-allowed;
@@ -272,16 +237,14 @@
 
 
 /* ─────────────────────────────────────────────
-   SHARED — Error tooltip
+   ERROR TOOLTIP
 ───────────────────────────────────────────── */
 
-.nps-survey .survey-options-wrapper,
 .sub-survey .survey-options-wrapper {
   position: relative;
   width: 100%;
 }
 
-.nps-survey .error-tooltip,
 .sub-survey .error-tooltip {
   position: absolute;
   bottom: -36px;
@@ -300,13 +263,11 @@
   pointer-events: none;
 }
 
-.nps-survey .error-tooltip.visible,
 .sub-survey .error-tooltip.visible {
   opacity: 1;
   transform: translateY(0);
 }
 
-.nps-survey .error-tooltip::before,
 .sub-survey .error-tooltip::before {
   content: '';
   position: absolute;
@@ -320,10 +281,9 @@
 
 
 /* ─────────────────────────────────────────────
-   SHARED — Thank You screen
+   THANK YOU SCREEN
 ───────────────────────────────────────────── */
 
-.nps-survey .thankyou-screen,
 .sub-survey .thankyou-screen {
   position: fixed;
   top: 0; left: 0;
@@ -337,7 +297,6 @@
   will-change: opacity;
 }
 
-.nps-survey .thankyou-bg,
 .sub-survey .thankyou-bg {
   position: absolute;
   top: 0; left: 0;
@@ -346,7 +305,6 @@
   z-index: 0;
 }
 
-.nps-survey .thankyou-overlay,
 .sub-survey .thankyou-overlay {
   position: absolute;
   top: 0; left: 0;
@@ -355,7 +313,6 @@
   z-index: 1;
 }
 
-.nps-survey .thankyou-content,
 .sub-survey .thankyou-content {
   position: relative;
   z-index: 2;
@@ -367,7 +324,6 @@
   max-width: 400px;
 }
 
-.nps-survey .thankyou-logo,
 .sub-survey .thankyou-logo {
   display: block;
   width: clamp(80px, 8vw, 120px);
@@ -375,10 +331,9 @@
   margin-bottom: clamp(16px, 2vw, 32px);
 }
 
-.nps-survey .thankyou-heading,
 .sub-survey .thankyou-heading {
   font-family: var(--font-heading);
-  font-size: clamp(36px, 4.5vw, 40px);
+  font-size: clamp(36px, 4.5vw, 68px);
   font-weight: 700;
   color: #fff;
   line-height: 0.95;
@@ -386,7 +341,6 @@
   letter-spacing: 0.01em;
 }
 
-.nps-survey .thankyou-body,
 .sub-survey .thankyou-body {
   font-family: var(--font-body);
   font-size: clamp(14px, 1.05vw, 17px);
@@ -395,26 +349,12 @@
   line-height: 1.55;
 }
 
-.nps-survey .thankyou-body a,
-.sub-survey .thankyou-body a {
-  color: #fff;
-  text-decoration: underline;
-  text-underline-offset: 3px;
-  font-weight: 500;
-  transition: opacity 0.2s ease;
-}
-
-.nps-survey .thankyou-body a:hover,
-.sub-survey .thankyou-body a:hover {
-  opacity: 0.75;
-}
-
 
 /* ─────────────────────────────────────────────
-   SHARED — Bottom row: back + submit
+   BOTTOM ROW: BACK + SUBMIT
 ───────────────────────────────────────────── */
 
-.survey-bottom-row {
+.sub-survey .survey-bottom-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -423,7 +363,7 @@
   min-height: 60px;
 }
 
-.back-btn {
+.sub-survey .back-btn {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -440,127 +380,28 @@
   pointer-events: none;
 }
 
-.back-btn.visible {
+.sub-survey .back-btn.visible {
   opacity: 1;
   pointer-events: auto;
 }
 
-.back-btn:hover {
+.sub-survey .back-btn:hover {
   background: var(--color-surface-hover);
   border-color: var(--color-border-hover);
   transform: translateY(-1px);
 }
 
-.back-btn:active {
+.sub-survey .back-btn:active {
   transform: translateY(0);
 }
 
-.survey-bottom-row .survey-submit {
+.sub-survey .survey-bottom-row .survey-submit {
   padding-top: 0;
 }
 
 
 /* ─────────────────────────────────────────────
-   NPS ONLY — Scrollable form area
-───────────────────────────────────────────── */
-
-.nps-survey .survey-form-scroll {
-  width: 100%;
-  max-width: 540px;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  overflow-y: auto;
-  overflow-x: hidden;
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-
-.nps-survey .survey-form-scroll::-webkit-scrollbar {
-  display: none;
-}
-
-/* Content wrapper */
-.nps-survey .survey-content,
-.sub-survey .survey-content {
-  width: 100%;
-}
-
-
-/* ─────────────────────────────────────────────
-   NPS ONLY — Number scale
-───────────────────────────────────────────── */
-
-.nps-survey .scale-container {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  width: 100%;
-}
-
-.nps-survey .scale-buttons {
-  display: flex;
-  gap: 8px;
-  width: 100%;
-}
-
-.nps-survey .scale-btn {
-  flex: 1;
-  aspect-ratio: 1;
-  max-height: 58px;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-btn);
-  background: transparent;
-  color: var(--color-text);
-  font-family: var(--font-body);
-  font-size: clamp(13px, 1.1vw, 16px);
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.22, 1, 0.36, 1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-}
-
-.nps-survey .scale-btn:hover {
-  background: var(--color-primary);
-  border-color: var(--color-primary);
-  color: #fff;
-  transform: translateY(-1px);
-}
-
-.nps-survey .scale-btn.selected {
-  background: var(--color-primary);
-  color: #fff;
-  border-color: var(--color-primary);
-}
-
-.nps-survey .scale-btn.in-range {
-  background: rgba(12, 35, 64, 0.1);
-  border-color: var(--color-border-hover);
-  color: var(--color-text);
-}
-
-.nps-survey .scale-labels {
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
-  padding: 0 2px;
-}
-
-.nps-survey .scale-label {
-  font-family: var(--font-body);
-  font-size: 12px;
-  color: var(--color-text-muted);
-  font-weight: 400;
-  letter-spacing: 0.02em;
-}
-
-
-/* ─────────────────────────────────────────────
-   SUBSCRIPTION ONLY — Form centre wrapper
+   FORM CENTRE WRAPPER
 ───────────────────────────────────────────── */
 
 .sub-survey .survey-form-center {
@@ -575,7 +416,7 @@
 
 
 /* ─────────────────────────────────────────────
-   SUBSCRIPTION ONLY — Progress bar
+   PROGRESS BAR
 ───────────────────────────────────────────── */
 
 .sub-survey .survey-progress-wrapper {
@@ -610,7 +451,7 @@
 
 
 /* ─────────────────────────────────────────────
-   SUBSCRIPTION ONLY — Scrollable form area
+   SCROLLABLE FORM AREA
 ───────────────────────────────────────────── */
 
 .sub-survey .survey-form-scroll {
@@ -627,9 +468,13 @@
   display: none;
 }
 
+.sub-survey .survey-content {
+  width: 100%;
+}
+
 
 /* ─────────────────────────────────────────────
-   SUBSCRIPTION ONLY — Single select pills
+   SINGLE SELECT PILLS
 ───────────────────────────────────────────── */
 
 .sub-survey .option-btn {
@@ -660,22 +505,19 @@
 
 
 /* ─────────────────────────────────────────────
-   MOBILE — Shared overrides
+   MOBILE
 ───────────────────────────────────────────── */
 
 @media (max-width: 768px) {
 
-  .nps-survey .survey-image-panel,
   .sub-survey .survey-image-panel {
     display: none;
   }
 
-  .nps-survey .survey-container,
   .sub-survey .survey-container {
     flex-direction: column;
   }
 
-  .nps-survey .survey-form-panel,
   .sub-survey .survey-form-panel {
     width: 100%;
     height: 100%;
@@ -684,29 +526,24 @@
     overflow: hidden;
   }
 
-  .nps-survey .survey-logo-wrapper,
   .sub-survey .survey-logo-wrapper {
     max-width: 100%;
   }
 
-  .nps-survey .survey-logo,
   .sub-survey .survey-logo {
     width: 120px;
   }
 
-  .nps-survey .survey-question,
   .sub-survey .survey-question {
     font-size: clamp(26px, 7vw, 36px);
-    text-align: left;
+    text-align: center;
     max-width: 100%;
   }
 
-  .nps-survey .survey-subtitle,
   .sub-survey .survey-subtitle {
     text-align: left;
   }
 
-  .nps-survey .submit-btn,
   .sub-survey .submit-btn {
     width: 100%;
     text-align: center;
@@ -714,87 +551,13 @@
     font-size: clamp(13px, 3.5vw, 15px);
   }
 
-  .nps-survey .thankyou-heading,
   .sub-survey .thankyou-heading {
     font-size: clamp(30px, 8vw, 48px);
   }
 
-  .nps-survey .thankyou-content,
   .sub-survey .thankyou-content {
     padding: 24px;
   }
-
-
-}
-
-
-/* ─────────────────────────────────────────────
-   MOBILE — NPS specific
-───────────────────────────────────────────── */
-
-@media (max-width: 768px) {
-
-  .nps-survey .survey-form-scroll {
-    max-width: 100%;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    overflow-y: auto;
-    padding-bottom: 120px;
-  }
-
-  .nps-survey .survey-content {
-    flex-shrink: 0;
-  }
-
-  .nps-survey .survey-description {
-    text-align: left;
-  }
-
-  .nps-survey .scale-buttons {
-    gap: 4px;
-  }
-
-.nps-survey .scale-btn {
-  flex: 1;
-  aspect-ratio: 1;
-  min-width: 0;
-  max-height: 52px;
-  max-width: 52px;
-  border: 1px solid var(--color-border);
-  border-radius: 0;
-  background: transparent;
-  color: var(--color-text);
-  font-family: var(--font-body);
-  font-size: clamp(13px, 1.1vw, 16px);
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.22, 1, 0.36, 1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  line-height: 1;
-}
-
-  .nps-survey .survey-submit {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    padding: clamp(16px, 4vw, 24px) clamp(24px, 6vw, 40px);
-    background: var(--color-bg);
-    z-index: 10;
-  }
-}
-
-
-/* ─────────────────────────────────────────────
-   MOBILE — Subscription specific
-───────────────────────────────────────────── */
-
-@media (max-width: 768px) {
 
   .sub-survey .survey-form-center {
     max-width: 100%;
@@ -804,10 +567,6 @@
     max-width: 100%;
     overflow-y: auto;
     padding-bottom: 40px;
-  }
-
-  .sub-survey .survey-question {
-    text-align: center;
   }
 
   .sub-survey .option-btn {

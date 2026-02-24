@@ -3,6 +3,8 @@ import { gsap } from 'gsap'
 import { CustomEase } from 'gsap/CustomEase'
 import { questions } from './questions'
 import Logo from '../../components/Logo'
+// NpsSurvey.jsx
+import './NpsSurvey.css'
 
 
 gsap.registerPlugin(CustomEase)
