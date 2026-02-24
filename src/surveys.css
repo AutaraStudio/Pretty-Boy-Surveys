@@ -767,7 +767,7 @@
   .sub-survey .submit-btn {
     width: 100%;
     text-align: center;
-    padding: clamp(16px, 4.5vw, 20px) 0;
+    padding: clamp(16px, 4.5vw, 20px) clamp(24px, 6vw, 40px);
     font-size: clamp(13px, 3.5vw, 15px);
   }
 
