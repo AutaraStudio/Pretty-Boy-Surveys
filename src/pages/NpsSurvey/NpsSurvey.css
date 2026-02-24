@@ -1,8 +1,17 @@
-/* D-DIN Condensed Bold for NPS headings */
+/* Deacon Condensed Bold — headings/questions */
 @font-face {
-  font-family: 'D-DINCondensed-Bold';
-  src: url('/fonts/D-DINCondensed-Bold.otf') format('opentype');
+  font-family: 'DeaconCondensed-Bold';
+  src: url('/fonts/DeaconCondensed-Bold.otf') format('opentype');
   font-weight: 700;
+  font-style: normal;
+  font-display: block;
+}
+
+/* ABC Diatype Condensed — body/inputs/buttons */
+@font-face {
+  font-family: 'ABCDiatypeCondensed';
+  src: url('/fonts/ABCDiatypeCondensed-regular.otf') format('opentype');
+  font-weight: 400;
   font-style: normal;
   font-display: block;
 }
@@ -22,10 +31,9 @@
   --color-black: #1A1A1A;
   --radius-pill: 0px;
   --radius-box: 0px;
-  --font-heading: 'D-DINCondensed-Bold', 'Arial Narrow', 'Impact', sans-serif;
-  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-heading: 'DeaconCondensed-Bold', 'Arial Narrow', 'Impact', sans-serif;
+  --font-body: 'ABCDiatypeCondensed', -apple-system, BlinkMacSystemFont, sans-serif;
 }
-
 /* Layout */
 .nps-survey .survey-container {
   display: flex;

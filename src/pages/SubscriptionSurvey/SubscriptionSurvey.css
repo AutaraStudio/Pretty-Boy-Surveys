@@ -1,4 +1,20 @@
-/* Inter Font — loaded via <link> in index.html */
+/* Deacon Condensed Bold — headings/questions */
+@font-face {
+  font-family: 'DeaconCondensed-Bold';
+  src: url('/fonts/DeaconCondensed-Bold.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: block;
+}
+
+/* ABC Diatype Condensed — body/inputs/buttons */
+@font-face {
+  font-family: 'ABCDiatypeCondensed';
+  src: url('/fonts/ABCDiatypeCondensed-regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+}
 
 .sub-survey {
   --color-primary: #1A1A1A;
@@ -15,7 +31,8 @@
   --color-black: #1A1A1A;
   --radius-pill: 50px;
   --radius-box: 10px;
-  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-heading: 'DeaconCondensed-Bold', 'Arial Narrow', 'Impact', sans-serif;
+  --font-body: 'ABCDiatypeCondensed', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 /* Layout */
