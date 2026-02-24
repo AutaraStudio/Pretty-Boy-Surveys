@@ -19,7 +19,7 @@ const DURATION_OUT = 0.28
 
 const STATIC_IMAGE = '/images/nps/survey-image.webp'
 
-const SHEET_URL = 'https://script.google.com/macros/s/AKfycbyhliXUiqU8dGP21BpcTWKBwfMvzFYZqWCcdmWYWTGlJu9fQ5VF6zEliEiDqp21Xieg/exec'
+const SHEET_URL = 'https://script.google.com/macros/s/AKfycbw8klL54DwV6dxla14l_gAp-Uro-PNXP1OkWtFX6jxwIieCSsaowv-EMo-_I0TYjY_d/exec'
 
 // ─── Unique session ID generated once per page visit ───
 const SESSION_ID = Math.random().toString(36).substring(2) + Date.now().toString(36)
