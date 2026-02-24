@@ -149,7 +149,7 @@
 .nps-survey .survey-question,
 .sub-survey .survey-question {
   font-family: var(--font-heading);
-  font-size: clamp(40px, 4.5vw, 62px);
+  font-size: clamp(32px, 3.5vw, 48px);
   font-weight: 700;
   color: var(--color-text);
   line-height: 0.95;
@@ -750,7 +750,7 @@ font-size: clamp(16px, 1.4vw, 20px);  font-weight: 400;
 
   .nps-survey .survey-question,
   .sub-survey .survey-question {
-    font-size: clamp(30px, 9vw, 44px);
+    font-size: clamp(26px, 7vw, 36px);
     text-align: left;
     max-width: 100%;
   }
