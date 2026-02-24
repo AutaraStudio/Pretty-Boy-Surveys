@@ -17,18 +17,18 @@
 }
 
 .sub-survey {
-  --color-primary: #1A1A1A;
-  --color-primary-hover: #333333;
-  --color-bg: #F5F3F0;
-  --color-surface: #ECEAE6;
-  --color-surface-hover: #E2E0DC;
+  --color-primary: #0C2340;
+  --color-primary-hover: #0e2b4e;
+  --color-bg: #A8C6DC;
+  --color-surface: #ffffff;
+  --color-surface-hover: #f0f4f8;
   --color-border: #D8D6D2;
   --color-border-hover: #B0ADA8;
-  --color-text: #1A1A1A;
+  --color-text: #0C2340;
   --color-text-muted: #8A8580;
   --color-text-light: #6A6560;
   --color-error: #E53E3E;
-  --color-black: #1A1A1A;
+  --color-black: #0C2340;
   --radius-pill: 50px;
   --radius-box: 10px;
   --font-heading: 'DeaconCondensed-Bold', 'Arial Narrow', 'Impact', sans-serif;
