@@ -96,7 +96,7 @@
 /* Logo */
 .sub-survey .survey-logo-wrapper {
   width: 100%;
-  max-width: 440px;
+  max-width: 540px;
   flex-shrink: 0;
   display: flex;
   justify-content: center;
@@ -104,7 +104,7 @@
 
 .sub-survey .survey-logo {
   display: block;
-  width: clamp(60px, 6vw, 90px);
+  width: clamp(80px, 8vw, 120px);
   height: auto;
 }
 
