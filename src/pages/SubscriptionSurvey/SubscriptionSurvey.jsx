@@ -174,9 +174,18 @@ function SubscriptionSurvey() {
   // ─── Staggered entrance animation ───
   useLayoutEffect(() => {
     if (showThankYou) return
-    const items = getAnimItems(formAreaRef.current)
+    const scrollEl = formAreaRef.current
+    const items = getAnimItems(scrollEl)
 
     gsap.set(items, { opacity: 0, y: 18, filter: 'blur(8px)' })
+
+    // Smoothly animate the container from its frozen height back to natural size
+    gsap.to(scrollEl, {
+      height: 'auto',
+      duration: DURATION_IN,
+      ease: 'buttery',
+      clearProps: 'height,overflow'
+    })
 
     const tl = gsap.timeline({ delay: 0.08 })
     items.forEach((el, i) => {
@@ -213,7 +222,12 @@ function SubscriptionSurvey() {
 
   // ─── Animate out helper ───
   const animateOut = useCallback((nextStep, direction = 'forward') => {
-    const items = getAnimItems(formAreaRef.current)
+    const scrollEl = formAreaRef.current
+
+    // Freeze height NOW so React's content swap doesn't cause a layout jump
+    gsap.set(scrollEl, { height: scrollEl.offsetHeight, overflow: 'hidden' })
+
+    const items = getAnimItems(scrollEl)
     const tl = gsap.timeline({
       onComplete: () => { setCurrentStep(nextStep); setIsAnimating(false) }
     })
