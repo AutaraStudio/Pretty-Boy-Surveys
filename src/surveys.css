@@ -27,8 +27,6 @@
 
 /* ─────────────────────────────────────────────
    DESIGN TOKENS
-   Defined on both survey roots so each page is
-   self-contained and variables always resolve.
 ───────────────────────────────────────────── */
 
 .nps-survey,
@@ -111,21 +109,17 @@
 .nps-survey .survey-logo-wrapper,
 .sub-survey .survey-logo-wrapper {
   width: 100%;
-  max-width: 540px;
+  max-width: 360px;
   flex-shrink: 0;
+  display: flex;
+  justify-content: center;
 }
 
 .nps-survey .survey-logo,
 .sub-survey .survey-logo {
-  width: clamp(160px, 15vw, 240px);
+  display: block;
+  width: clamp(60px, 6vw, 90px);
   height: auto;
-  color: var(--color-text);
-}
-
-/* Content wrapper */
-.nps-survey .survey-content,
-.sub-survey .survey-content {
-  width: 100%;
 }
 
 
@@ -203,7 +197,8 @@
   background: var(--color-surface);
   color: var(--color-text);
   font-family: var(--font-body);
-font-size: clamp(16px, 1.4vw, 20px);  font-weight: 400;
+  font-size: clamp(16px, 1.4vw, 20px);
+  font-weight: 400;
   resize: none;
   outline: none;
   line-height: 1.6;
@@ -365,9 +360,9 @@ font-size: clamp(16px, 1.4vw, 20px);  font-weight: 400;
 
 .nps-survey .thankyou-logo,
 .sub-survey .thankyou-logo {
-  width: clamp(160px, 15vw, 240px);
+  display: block;
+  width: clamp(80px, 8vw, 120px);
   height: auto;
-  color: #fff;
   margin-bottom: clamp(16px, 2vw, 32px);
 }
 
@@ -462,7 +457,7 @@ font-size: clamp(16px, 1.4vw, 20px);  font-weight: 400;
 
 .nps-survey .survey-form-scroll {
   width: 100%;
-  max-width: 540px;
+  max-width: 360px;
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -475,6 +470,12 @@ font-size: clamp(16px, 1.4vw, 20px);  font-weight: 400;
 
 .nps-survey .survey-form-scroll::-webkit-scrollbar {
   display: none;
+}
+
+/* Content wrapper */
+.nps-survey .survey-content,
+.sub-survey .survey-content {
+  width: 100%;
 }
 
 
@@ -555,7 +556,7 @@ font-size: clamp(16px, 1.4vw, 20px);  font-weight: 400;
 
 .sub-survey .survey-form-center {
   width: 100%;
-  max-width: 540px;
+  max-width: 360px;
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -624,12 +625,14 @@ font-size: clamp(16px, 1.4vw, 20px);  font-weight: 400;
 
 .sub-survey .option-btn {
   width: 100%;
-padding: clamp(10px, 0.9vw, 13px) clamp(22px, 2vw, 30px);  border: 1px solid var(--color-border);
+  padding: clamp(10px, 0.9vw, 13px) clamp(22px, 2vw, 30px);
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-pill);
   background: var(--color-surface);
   color: var(--color-text);
   font-family: var(--font-body);
-font-size: clamp(16px, 1.4vw, 20px);  font-weight: 400;
+  font-size: clamp(16px, 1.4vw, 20px);
+  font-weight: 400;
   cursor: pointer;
   transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
   text-align: center;
@@ -644,76 +647,6 @@ font-size: clamp(16px, 1.4vw, 20px);  font-weight: 400;
   background: var(--color-primary);
   color: #fff;
   border-color: var(--color-primary);
-}
-
-
-/* ─────────────────────────────────────────────
-   SUBSCRIPTION ONLY — Multi select checkboxes
-───────────────────────────────────────────── */
-
-.sub-survey .option-checkbox {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  width: 100%;
-  padding: clamp(6px, 0.5vw, 8px) 4px;
-  background: transparent;
-  border: none;
-  border-radius: 0;
-  cursor: pointer;
-  transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
-  font-family: var(--font-body);
-  font-size: clamp(14px, 1.05vw, 16px);
-  color: var(--color-text-light);
-}
-
-.sub-survey .option-checkbox:hover {
-  color: var(--color-text);
-}
-
-.sub-survey .option-checkbox.selected {
-  color: var(--color-text);
-}
-
-.sub-survey .option-checkbox input {
-  display: none;
-}
-
-.sub-survey .option-checkbox .check-indicator {
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  border: 1px solid var(--color-border-hover);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
-  color: transparent;
-}
-
-.sub-survey .option-checkbox.selected .check-indicator {
-  background: var(--color-primary);
-  border-color: var(--color-primary);
-  color: #fff;
-}
-
-.sub-survey .option-checkbox .check-indicator svg {
-  opacity: 0;
-  transition: opacity 0.2s ease;
-}
-
-.sub-survey .option-checkbox.selected .check-indicator svg {
-  opacity: 1;
-}
-
-.sub-survey .checkbox-label-text {
-  font-weight: 400;
-  line-height: 1.4;
-}
-
-.sub-survey .option-checkbox.selected .checkbox-label-text {
-  font-weight: 500;
 }
 
 
@@ -745,7 +678,6 @@ font-size: clamp(16px, 1.4vw, 20px);  font-weight: 400;
   .nps-survey .survey-logo-wrapper,
   .sub-survey .survey-logo-wrapper {
     max-width: 100%;
-    text-align: center;
   }
 
   .nps-survey .survey-question,
@@ -848,13 +780,8 @@ font-size: clamp(16px, 1.4vw, 20px);  font-weight: 400;
   }
 
   .sub-survey .option-btn {
-   padding: clamp(10px, 2.5vw, 13px) clamp(20px, 4vw, 28px);
-font-size: clamp(16px, 4vw, 20px);
-  }
-
-  .sub-survey .option-checkbox {
-    padding: clamp(6px, 1.5vw, 8px) 4px;
-    font-size: clamp(14px, 3.8vw, 16px);
+    padding: clamp(10px, 2.5vw, 13px) clamp(20px, 4vw, 28px);
+    font-size: clamp(16px, 4vw, 20px);
   }
 
   .sub-survey .survey-submit {
