@@ -165,7 +165,7 @@
   padding: clamp(16px, 1.4vw, 22px);
   border: 1.5px solid var(--color-border);
   border-radius: var(--radius-box);
-  background: var(--color-bg);
+  background: var(--color-surface);
   color: var(--color-text);
   font-family: var(--font-body);
   font-size: clamp(14px, 1.1vw, 16px);
@@ -201,7 +201,7 @@
   background: var(--color-black);
   color: #fff;
   border: none;
-  border-radius: 0px;
+  border-radius: 6px;
   font-family: var(--font-body);
   font-size: clamp(12px, 1vw, 14px);
   font-weight: 500;
@@ -284,7 +284,7 @@
   max-height: 62px;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-box);
-  background: var(--color-bg);
+  background: var(--color-surface);
   color: var(--color-text);
   font-family: var(--font-body);
   font-size: clamp(14px, 1.2vw, 17px);
@@ -514,7 +514,7 @@
   width: 44px;
   height: 44px;
   border: 1.5px solid var(--color-border);
-  border-radius: 0px;
+  border-radius: 6px;
   background: transparent;
   color: var(--color-text);
   cursor: pointer;
