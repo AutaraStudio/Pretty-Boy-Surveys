@@ -451,7 +451,7 @@
   max-width: 52px;
   border: 1px solid var(--color-border);
   border-radius: 0;
-  background: transparent;
+  background: #eef3f7bf;
   color: var(--color-text);
   font-family: var(--font-body);
   font-size: clamp(13px, 1.1vw, 16px);
@@ -493,9 +493,9 @@
 
 .nps-survey .scale-label {
   font-family: var(--font-body);
-  font-size: 12px;
-  color: var(--color-text-muted);
-  font-weight: 400;
+  font-size: 14px;
+  color: var(--color-primary);
+  font-weight: 600;
   letter-spacing: 0.02em;
 }
 
