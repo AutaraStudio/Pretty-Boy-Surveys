@@ -172,9 +172,8 @@
 .nps-survey .option-textarea {
   width: 100%;
   padding: clamp(14px, 1.3vw, 20px);
-  border: 1px solid var(--color-border);
   border-radius: var(--radius-box);
-  background: eef3f7bf;
+  background: #eef3f7bf;
   color: var(--color-text);
   font-family: var(--font-body);
   font-size: clamp(16px, 1.4vw, 20px);
